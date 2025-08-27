@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS registrants (
 	email TEXT NOT NULL,
 	mess_id INT NOT NULL CONSTRAINT fk_registrant_mess REFERENCES mess(id),
 	month INT NOT NULL,
-	year INT NOT NULL
+	year INT NOT NULL,
+	UNIQUE(email, month, year)
 ); 
 
 -- Redis is used for rest of the active data

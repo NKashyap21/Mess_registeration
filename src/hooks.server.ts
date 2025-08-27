@@ -17,8 +17,9 @@ async function redisQueueWorker() {
 	console.log('Redis Queue Worker Started to insert registrants.');
 
 	while (true) {
-		const data = JSON.parse((await blockClient.blPop('registration:registrants', 0)).element);
-		console.log(data);
+		const data: RegistrationData = JSON.parse(
+			(await blockClient.blPop('mess:registrants', 0)).element
+		);
 		try {
 			console.log(`Registrant Email: ${data.email}  Mess: ${data.messId}`);
 			await sql`

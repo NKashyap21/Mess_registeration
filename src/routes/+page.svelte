@@ -7,7 +7,7 @@
 </script>
 
 <main class="p-8">
-	<section class="flex items-center">
+	<section class="mb-10 flex items-center">
 		<div class="flex flex-col">
 			<h1 class="text-4xl font-bold">Mess Registration Portal</h1>
 			<h4 class=" opacity-50">Indian Institute of Technology - Hyderabad</h4>
@@ -35,10 +35,10 @@
 	</section>
 
 	{#each data.messData as mess}
-		<section class="mt-12 flex flex-col gap-y-3">
+		<section class="mt-5 flex flex-col gap-y-3">
 			<h3 class="text-xl">
 				{mess.name}
-				{#if data.registeredMess[0].name == mess.name}
+				{#if data.registeredMess[0]?.name ?? '' == mess.name}
 					<span class="text-lg opacity-75">( Registered for this mess )</span>
 				{/if}
 			</h3>
@@ -61,14 +61,14 @@
 				class="btn w-fit self-end {data.session != null ? 'btn-primary' : 'btn-warning'}"
 				hidden={data.registeredMess.length != 0}
 			>
-				{#if data.registrationLive}
-					{#if data.session != null}
+				{#if data.session != null}
+					{#if data.registrationLive}
 						Register for this mess
 					{:else}
-						Log in to register
+						Registration has not started yet
 					{/if}
 				{:else}
-					Registration has not started yet
+					Log in to register
 				{/if}
 			</button>
 		</section>

@@ -25,7 +25,7 @@ export const load: LayoutServerLoad = async (event) => {
 		ORDER BY	
 			m.name ASC, mc.from_year DESC, mc.from_month DESC NULLS LAST
 		`) as MessData[],
-		registrationLive: (await redisClient.get('registration:live')) == 'true',
+		registrationLive: (await redisClient.get('mess:live')) == 'true',
 		registeredMess: (await sql` 
 		SELECT 
 			m.name
