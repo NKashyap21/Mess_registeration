@@ -3,7 +3,6 @@
 	import GoogleSignInBtn from '$lib/components/GoogleSignInBtn.svelte';
 
 	let { data }: PageProps = $props();
-	console.log(data.registeredMess);
 </script>
 
 <main class="p-8">
@@ -23,6 +22,7 @@
 				<GoogleSignInBtn />
 			{:else}
 				<div class="flex items-center gap-x-2">
+					{@debug data}
 					<img
 						class="size-10 rounded-full"
 						src={data.session?.user?.image ?? 'https://avatar.iran.liara.run/public'}
@@ -38,11 +38,13 @@
 		<section class="mt-5 flex flex-col gap-y-3">
 			<h3 class="text-xl">
 				{mess.name}
-				{#if data.registeredMess[0]?.name ?? '' == mess.name}
+				{#if (data.registeredMess[0]?.name ?? '') == mess.name}
 					<span class="text-lg opacity-75">( Registered for this mess )</span>
 				{/if}
 			</h3>
-			<div class="stats shadow">
+			<div
+				class="stats shadow {(data.registeredMess[0]?.name ?? '') == mess.name ? 'bg-accent' : ''}"
+			>
 				<div class="stat">
 					<p class="stat-value">{mess.total_registrants}</p>
 					<p class="stat-title">Total Registrants</p>
