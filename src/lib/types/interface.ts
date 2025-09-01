@@ -9,3 +9,11 @@ export interface RegistrationData {
 	email: string;
 	messId: number;
 }
+
+export interface SearchEmailRequest {
+	email: string;
+}
+
+export interface SearchEmailResponse {
+	mess_id: number;
+}

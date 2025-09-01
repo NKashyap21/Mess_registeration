@@ -1,8 +1,13 @@
 <script lang="ts">
+	import type { SearchEmailResponse } from '$lib/types/interface';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let registrationLive = $state(data.registrationLive);
+	let formEmail = $state('');
+
+	let searchUserRegistered = $state(false);
+	let searchUserMess = $state(-1);
 </script>
 
 <main class="flex flex-col p-8">
@@ -106,11 +111,50 @@
 									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
 								</g>
 							</svg>
-							<input type="email" placeholder="mail@iith.ac.in" class="w-[15rem]" required />
+							<input
+								bind:value={formEmail}
+								type="email"
+								name="email"
+								placeholder="mail@iith.ac.in"
+								class="w-[15rem]"
+								required
+							/>
 						</label>
 						<div class="validator-hint hidden">Enter valid email address</div>
 					</div>
-					<button class="btn join-item btn-primary">Search</button>
+					<button
+						onclick={async () => {
+							const params = new URLSearchParams({ email: formEmail });
+							const res = await fetch('admin/search?' + params.toString());
+							const data = (await res.json()) as SearchEmailResponse;
+							searchUserMess = data.mess_id;
+							searchUserRegistered = data.mess_id != -1;
+						}}
+						class="btn join-item btn-primary">Search</button
+					>
+				</div>
+			</div>
+			<div class="stats mt-8 border border-base-300">
+				<div class="stat">
+					<p class="stat-title">Registered</p>
+					<p class="stat-value">
+						{#if searchUserRegistered}
+							Yes
+						{:else}
+							No
+						{/if}
+					</p>
+				</div>
+
+				<div class="stat">
+					<p class="stat-title">Mess</p>
+					<p class="stat-value">
+						{#if searchUserMess != -1}
+							{data.messData.find((mess) => mess.id == searchUserMess)?.name}
+						{:else}
+							No Mess
+						{/if}
+					</p>
 				</div>
 			</div>
 		</section>
