@@ -1,0 +1,27 @@
+services:
+    api:
+        build: .
+        container_name: mess-api
+        ports:
+            - "8080:8080"
+        env_file:
+            - .env
+        depends_on:
+            - db
+
+    db:
+        image: postgres:16
+        container_name: mess-db
+        restart: always
+        environment:
+            POSTGRES_USER: messuser
+            POSTGRES_PASSWORD: messpass
+            POSTGRES_DB: messdb
+        ports:
+            - "5433:5432" # use localhost:5433 from your laptop
+        volumes:
+            - db-data:/var/lib/postgresql/data
+            - ./migrations:/docker-entrypoint-initdb.d
+
+volumes:
+    db-data:

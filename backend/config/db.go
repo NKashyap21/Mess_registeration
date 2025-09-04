@@ -2,40 +2,26 @@ package config
 
 import (
 	"context"
-	"log/slog"
+	"fmt"
 	"os"
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var DB *pgxpool.Pool
 
-func InitDB() {
-	var err error
-	DB, err = pgxpool.New(context.Background(), os.Getenv("DB_URL"))
+func ConnectPSQL() {
+	dsn := os.Getenv("DB_URL")
 
+	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
-		slog.Error("Failed to initialize DB")
-		os.Exit(1)
+		panic(fmt.Sprintf("Unable to connect to database: %v\n", err))
 	}
-	// driver, err := pgx.WithInstance(stdlib.OpenDBFromPool(DB), &pgx.Config{})
 
-	// if err != nil {
-	// 	slog.Error("Failed to initialize Migrator Driver")
-	// 	os.Exit(1)
-	// }
+	if err := pool.Ping(context.Background()); err != nil {
+		panic(fmt.Sprintf("Unable to ping database: %v\n", err))
+	}
 
-	// wd, err := os.Getwd()
-	// m, err := migrate.NewWithDatabaseInstance(filepath.Join("file:///", wd, "migrations"), "postgres", driver)
-	// if err != nil {
-	// 	slog.Error("Failed to initialize New Migrator")
-	// 	slog.Error(err.Error())
-	// 	os.Exit(1)
-	// }
-	// if err = m.Up(); err != nil {
-	// 	slog.Error("Failed to migrate UP")
-	// 	slog.Error(err.Error())
-	// }
-
+	DB = pool
+	fmt.Println("✅ Connected to PostgreSQL with pgxpool!")
 }
