@@ -1,27 +1,31 @@
 package config
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-var DB *pgxpool.Pool
+var DB *gorm.DB
 
-func ConnectPSQL() {
+func ConnectDB() {
+
 	dsn := os.Getenv("DB_URL")
 
-	pool, err := pgxpool.New(context.Background(), dsn)
+	if dsn == "" {
+		log.Fatal("DB_URL environment variable is not set")
+	}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic(fmt.Sprintf("Unable to connect to database: %v\n", err))
+		log.Fatal("Failed to connect to database: %v", err)
 	}
 
-	if err := pool.Ping(context.Background()); err != nil {
-		panic(fmt.Sprintf("Unable to ping database: %v\n", err))
-	}
+	fmt.Println("Connected to database")
 
-	DB = pool
-	fmt.Println("✅ Connected to PostgreSQL with pgxpool!")
+	DB = db
+
 }

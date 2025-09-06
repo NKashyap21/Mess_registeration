@@ -9,11 +9,12 @@ import (
 )
 
 func init() {
+	config.LoadEnvVaariables()
 	// Load config.json
 	config.LoadConfig()
 
 	// Connect DB
-	config.ConnectPSQL()
+	config.ConnectDB()
 }
 
 func main() {
