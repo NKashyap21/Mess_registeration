@@ -1,54 +1,85 @@
 package router
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/gin-contrib/cors"
+	"github.com/LambdaIITH/mess_registration/internal/controller"
+	"github.com/LambdaIITH/mess_registration/internal/middlewares"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-// Custom log formatter (like in gian_portal)
-func LogFormatter(params gin.LogFormatterParams) string {
-	return fmt.Sprintf("[%s] - %s \"%s %s %s %d %s \"%s\" %s\"\n",
-		params.TimeStamp.Format("2006-01-02 15:04:05"),
-		params.ClientIP,
-		params.Method,
-		params.Path,
-		params.Request.Proto,
-		params.StatusCode,
-		params.Latency,
-		params.Request.UserAgent(),
-		params.ErrorMessage,
-	)
-}
+func SetupRouter(db *gorm.DB) *gin.Engine {
+	r := gin.Default()
 
-func SetupRouter() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	router := gin.Default()
-	fmt.Println("\033[36mMess Registration server started.\033[0m")
+	// Initialize controllers
+	userController := controller.NewUserController(db)
+	swapController := controller.NewSwapController(db)
 
-	// Custom logger
-	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-		Output:    os.Stdout,
-		Formatter: LogFormatter,
-	}))
+	// Health check
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "Mess Registration API is running",
+		})
+	})
 
-	// Optional: add request logging middleware if you create one
-	// router.Use(middlewares.RequestLoggerMiddleware)
+	// API routes
+	api := r.Group("/api")
 
-	// ✅ CORS setup
-	config := cors.Config{
-		AllowOrigins:     []string{os.Getenv("WEB_URL")}, // must include http:// or https://
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
+	// Public routes (no authentication required)
+	api.POST("/register", userController.RegisterUser)
+	api.POST("/login", authController.Login)
+
+	// Protected routes (require JWT authentication)
+	protected := api.Group("/")
+	protected.Use(middlewares.AuthMiddleware())
+	{
+		// Auth routes
+		protected.POST("/refresh", authController.RefreshToken)
+		protected.POST("/logout", authController.Logout)
+		protected.GET("/profile", authController.GetProfile)
+
+		// User routes
+		protected.GET("/user", userController.GetUser)
+
+		// Swap routes
+		protected.POST("/swap-request", swapController.CreateSwapRequest)
+		protected.DELETE("/swap-request", swapController.DeleteSwapRequest)
+		protected.GET("/get-swaps", swapController.GetSwaps)
 	}
-	router.Use(cors.New(config))
 
-	// Routes
-	SetupRoutes(router)
+	// Routes with body-based JWT authentication (alternative method)
+	bodyAuth := api.Group("/")
+	bodyAuth.Use(middlewares.AuthMiddlewareWithBody())
+	{
+		bodyAuth.GET("/user-alt", userController.GetUser) // Alternative endpoint
+	}
 
-	return router
+	// Mess staff routes (require API key authentication)
+	messStaff := api.Group("/")
+	messStaff.Use(middlewares.MessAPIKeyMiddleware())
+	{
+		messStaff.GET("/scanning", userController.ScanUser)
+	}
+
+	// Hostel office routes (require JWT + admin check)
+	hostelOffice := api.Group("/admin")
+	hostelOffice.Use(middlewares.AuthMiddleware(), middlewares.AdminMiddleware(db))
+	{
+		hostelOffice.GET("/user", userController.GetUserByRollNo)
+		hostelOffice.POST("/update", userController.UpdateUser)
+		hostelOffice.GET("/users", userController.GetAllUsers)
+		hostelOffice.DELETE("/reset", userController.ResetUsers)
+		hostelOffice.POST("/auto-match", swapController.AutoMatchSwaps)
+	}
+
+	// Development/Testing routes
+	if gin.Mode() == gin.DebugMode {
+		dev := api.Group("/dev")
+		{
+			dev.GET("/users", userController.GetAllUsers)
+			dev.DELETE("/reset", userController.ResetUsers)
+		}
+	}
+
+	return r
 }
