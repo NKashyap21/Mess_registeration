@@ -1,4 +1,12 @@
 @import 'tailwindcss';
-@plugin 'daisyui' {
-	themes: fantasy --default;
+
+@theme {
+	--color-custom-orange: #f05a25;
+	--color-custom-black: #121212;
+	--color-custom-mid-grey: #303030;
+	--color-custom-dark-grey: #292929;
+	--color-custom-light-grey: #d1d1d1;
+	--color-custom-green: #00ff2f;
+	--color-custom-red: #ff0004;
+	--color-custom-off-white: #f8f8f8;
 }
