@@ -1,6 +1,7 @@
 <script lang="ts">
 	import iithLogoLight from '$lib/assets/iith-logo-light.webp';
 	import iithLogoDark from '$lib/assets/iith-logo-dark.webp';
+	import darkDarkSvg from '$lib/assets/dark-dark.svg';
 	import darkSvg from '$lib/assets/dark.svg';
 	import { colorScheme } from '$lib/state/dark.svelte';
 </script>
@@ -14,6 +15,7 @@
 		}}
 		class="ml-auto hover:cursor-pointer"
 	>
-		<img src={darkSvg} alt="dark svg" />
+		<img src={darkDarkSvg} class="hidden dark:block" alt="dark svg" />
+		<img src={darkSvg} class="size dark:hidden" alt="dark svg" />
 	</button>
 </header>

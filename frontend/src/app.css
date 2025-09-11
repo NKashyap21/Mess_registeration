@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+:root {
+	font-family: 'Outfit';
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
