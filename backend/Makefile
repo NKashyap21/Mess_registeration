@@ -1,109 +1,43 @@
-.PHONY: build run test clean docker-up docker-down dev migrate
+# Project variables
+COMPOSE = docker compose
+BACKEND = mess_registration_backend
+DB = mess_registration_db
 
-# Variables
-APP_NAME := mess-registration
-DOCKER_COMPOSE := docker-compose
-GO_FILES := $(shell find . -name "*.go" -type f)
+.PHONY: up down restart logs backend-logs db-logs ps build
 
-# Default target
-all: build
+# Start all services (backend + db)
+up:
+	$(COMPOSE) up -d --build
 
-# Build the application
+# Stop and remove containers
+down:
+	$(COMPOSE) down
+
+# Restart services
+restart: down up
+
+# Build images without running
 build:
-	@echo "Building $(APP_NAME)..."
-	@go build -o bin/$(APP_NAME) .
+	$(COMPOSE) build
 
-# Run the application locally (requires local PostgreSQL)
-run:
-	@echo "Running $(APP_NAME)..."
-	@go run .
+# Logs
+logs:
+	$(COMPOSE) logs -f
 
-# Run with hot reload using air
-dev:
-	@echo "Starting development server with hot reload..."
-	@air
+backend-logs:
+	$(COMPOSE) logs -f $(BACKEND)
 
-# Run tests
-test:
-	@echo "Running tests..."
-	@go test -v ./...
+db-logs:
+	$(COMPOSE) logs -f $(DB)
 
-# Clean build artifacts
-clean:
-	@echo "Cleaning..."
-	@rm -rf bin/
-	@go clean
+# Run only database
+db:
+	$(COMPOSE) up -d db
 
-# Docker commands
-docker-up:
-	@echo "Starting Docker containers..."
-	@$(DOCKER_COMPOSE) up -d
+# Run only backend
+backend:
+	$(COMPOSE) up -d backend
 
-docker-down:
-	@echo "Stopping Docker containers..."
-	@$(DOCKER_COMPOSE) down
-
-docker-logs:
-	@echo "Showing Docker logs..."
-	@$(DOCKER_COMPOSE) logs -f
-
-docker-build:
-	@echo "Building Docker image..."
-	@$(DOCKER_COMPOSE) build
-
-# Database commands
-db-reset:
-	@echo "Resetting database..."
-	@$(DOCKER_COMPOSE) down -v
-	@$(DOCKER_COMPOSE) up -d db
-	@sleep 5
-	@$(DOCKER_COMPOSE) up -d app
-
-# Development workflow
-setup: docker-up
-	@echo "Waiting for database to be ready..."
-	@sleep 10
-	@echo "Setup complete! Application should be running on http://localhost:8080"
-
-# Quick development start
-quick-dev: docker-down docker-up
-	@echo "Quick development setup complete!"
-
-# Install dependencies
-deps:
-	@echo "Installing dependencies..."
-	@go mod tidy
-	@go mod download
-
-# Format code
-fmt:
-	@echo "Formatting code..."
-	@go fmt ./...
-
-# Lint code (requires golangci-lint)
-lint:
-	@echo "Linting code..."
-	@golangci-lint run
-
-# Generate documentation
-docs:
-	@echo "The API documentation is available in APIdocs.md"
-
-# Show help
-help:
-	@echo "Available commands:"
-	@echo "  build       - Build the application"
-	@echo "  run         - Run the application locally"
-	@echo "  dev         - Run with hot reload (requires air)"
-	@echo "  test        - Run tests"
-	@echo "  clean       - Clean build artifacts"
-	@echo "  docker-up   - Start Docker containers"
-	@echo "  docker-down - Stop Docker containers"
-	@echo "  docker-logs - Show Docker logs"
-	@echo "  db-reset    - Reset database"
-	@echo "  setup       - Initial setup with Docker"
-	@echo "  quick-dev   - Quick development setup"
-	@echo "  deps        - Install dependencies"
-	@echo "  fmt         - Format code"
-	@echo "  lint        - Lint code"
-	@echo "  help        - Show this help"
+# Open a psql shell into DB
+psql:
+	docker exec -it $(DB) psql -U postgres -d mess_registration
