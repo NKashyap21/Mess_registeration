@@ -5,48 +5,37 @@ import (
 	"os"
 
 	"github.com/LambdaIITH/mess_registration/config"
-	"github.com/LambdaIITH/mess_registration/internal/db"
-	"github.com/LambdaIITH/mess_registration/internal/router"
-	"github.com/gin-gonic/gin"
+	// "github.com/LambdaIITH/mess_registration/migrations"
+	"github.com/LambdaIITH/mess_registration/router"
+	"github.com/joho/godotenv"
 )
 
-// func init() {
-// 	config.LoadEnvVaariables()
-// 	// Load config.json
-// 	config.LoadConfig()
-
-// 	// Connect DB
-// 	config.ConnectDB()
-// }
-
 func main() {
-	// Load configuration
-	config.LoadEnvVariables()
-
-	//Initialize database
-	database, err := db.InitDB()
-
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+	// Load environment variables from .env file (if exists)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using system environment variables")
 	}
 
-	// Run migrations
-	if err := db.MigrateDB(database); err != nil {
-		log.Fatal("Failed to run migrations:", err)
-	}
+	// Initialize database connection
+	config.ConnectDatabase()
 
-	gin.SetMode(os.Getenv("GIN_MODE"))
+	// Run database migrations
+	// if err := migrations.MigrateDB(); err != nil {
+	// 	log.Fatal("Failed to migrate database:", err)
+	// }
 
-	r := router.SetupRouter(database)
+	// Setup router
+	r := router.SetupRouter()
 
+	// Get port from environment or use default
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Server started on port %s", port)
-	if r.Run(":" + port); err != nil {
+	// Start server
+	log.Printf("Server starting on port %s", port)
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
-
 }
