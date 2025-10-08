@@ -1,0 +1,49 @@
+# doesnt work as of now
+# need to see svelte
+services:
+  db:
+    image: postgres:15
+    container_name: mess_registration_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mess_registration
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mess_registration_backend
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: db
+    networks:
+      - backend
+      - frontend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mess_registration_frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - frontend
+
+volumes:
+  postgres_data:
+
+networks:
+  frontend:
+  backend:

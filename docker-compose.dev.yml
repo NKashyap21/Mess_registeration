@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:15
+    container_name: mess_registration_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mess_registration
+    # ports:
+    #   - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile.dev
+    container_name: mess_registration_backend
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: db # override local host -> docker service name
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+      - frontend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile.dev
+    container_name: mess_registration_frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    networks:
+      - frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+
+networks:
+  frontend:
+  backend:

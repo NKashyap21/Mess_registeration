@@ -62,3 +62,7 @@ work:
 Saadiq:  in test app. connect to it and make sure everything works(test locally)
 Rayaan: test and work on website and make sure everything works
 Dhiraj+Kashyap: backend + db work
+
+
+---
+discussions on sep 27 meet
