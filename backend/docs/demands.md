@@ -48,7 +48,7 @@ EXTRA
 3. swap_requests
 4. meal_scans
 5. monthly_swap_tracking
-6.
+6. Create a table for loggs.
 
 ## Api list
 

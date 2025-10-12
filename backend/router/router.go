@@ -52,6 +52,9 @@ func SetupRouter() *gin.Engine {
 	messStaff.GET("/scanning", staffController.ScanningHandler)
 
 	hostelOffice := api.Group("/office")
+	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
+	hostelOffice.Use(middleware.HostelOfficeMiddleWare(config.GetDB()))
+
 	hostelOffice.GET("/students", officeController.GetStudents)
 	hostelOffice.GET("/students/:roll_no", officeController.GetStudentsByID)
 	hostelOffice.PUT("/students/", officeController.EditStudentById)
