@@ -20,5 +20,5 @@
 	<main class="flex h-full w-full grow flex-col items-center justify-center **:transition-colors">
 		{@render children?.()}
 	</main>
-	<div class="mb-10 self-center text-custom-light-grey">Brought to you with 💜 by Lambda</div>
+	<div class="mb-10 self-center text-custom-light-grey">Brought to you with 🧡💜🧡 by Lambda</div>
 </div>
