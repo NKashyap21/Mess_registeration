@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/handlers/auth"
+	hosteloffice "github.com/LambdaIITH/mess_registration/handlers/hostelOffice"
 	"github.com/LambdaIITH/mess_registration/handlers/registration"
 	"github.com/LambdaIITH/mess_registration/handlers/staff"
 	"github.com/LambdaIITH/mess_registration/handlers/status"
@@ -32,6 +33,7 @@ func SetupRouter() *gin.Engine {
 	registrationController := registration.InitMessController()
 	swapController := swap.InitSwapController()
 	staffController := staff.InitStaffController()
+	officeController := hosteloffice.InitOfficeController()
 
 	// Health check routes
 	api.GET("/health", healthController.CheckHealth)
@@ -49,7 +51,10 @@ func SetupRouter() *gin.Engine {
 	messStaff := api.Group("/messStaff")
 	messStaff.GET("/scanning", staffController.ScanningHandler)
 
-
+	hostelOffice := api.Group("/office")
+	hostelOffice.GET("/students", officeController.GetStudents)
+	hostelOffice.GET("/students/:roll_no", officeController.GetStudentsByID)
+	hostelOffice.PUT("/students/", officeController.EditStudentById)
 
 	return r
 }

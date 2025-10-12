@@ -36,6 +36,11 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 		return
 	}
 
+	if !user.CanRegister {
+		utils.RespondWithError(c, http.StatusBadRequest, "User cannot Register.")
+		return
+	}
+
 	if user.Mess != 0 {
 		utils.RespondWithError(c, http.StatusBadRequest, "User already has a mess assigned")
 		return
@@ -59,7 +64,7 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update mess: "+err.Error())
 		return
 	}
-	
+
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 		Message: "Mess registration successful",
 	})
