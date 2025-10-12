@@ -35,8 +35,10 @@ func (s *SyncService) isRegistrationOpen() bool {
 	}
 
 	currentTime := time.Now()
-	return currentTime.After(registrationDetails.StartTime) && currentTime.Before(registrationDetails.EndTime)
+	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
 }
+
+
 
 // StartBackgroundSync starts the background sync process
 func (s *SyncService) StartBackgroundSync(intervalSeconds int) {
