@@ -1,13 +1,37 @@
-FROM node:20-alpine
+# --- Stage 1: Build the app ---
+FROM node:latest AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+RUN npm install -g pnpm
 
-RUN npm install
+# Copy only necessary files first (for caching)
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-# COPY . . for dev we are mounting
+# Copy source code
+COPY . .
 
-EXPOSE 5173
+# Build the SvelteKit SSR app
+RUN pnpm run build
 
-CMD ["npm", "run", "dev","--","--host"]
+# --- Stage 2: Production runtime ---
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Copy production files from builder
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/node_modules ./node_modules
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV ORIGIN=https://mess.iith.dev
+
+EXPOSE 3000
+
+# Run the SvelteKit SSR server
+CMD ["node", "build"]

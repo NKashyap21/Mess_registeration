@@ -29,6 +29,8 @@ func main() {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
+	// SeedDatabase()
+
 	// Initialize Logger Service
 	loggerService := services.GetLoggerService()
 	loggerService.LogSystemAction("SYSTEM_START", "Application starting up")

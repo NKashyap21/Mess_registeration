@@ -5,7 +5,7 @@ type LoggerDetails struct {
 	Action      string      `json:"action"`
 	Message     string      `json:"message"`
 	IPAddress   string      `json:"ip_address"`
-	HTTPDetails HTTPDetails `json:"http_details"`
+	HTTPDetails HTTPDetails `gorm:"embedded;embeddedPrefix:http_"`
 	Timestamp   string      `json:"timestamp"`
 }
 
