@@ -72,18 +72,12 @@ func SetupRouter() *gin.Engine {
 	hostelOffice.POST("/refreshCapacities", registrationController.RefreshCapacitiesHandler)
 	hostelOffice.GET("/messStatsGrouped", registrationController.GetMessStatsGroupedHandler)
 
-	// Admin routes for logs (should be protected with admin middleware)
-	admin := api.Group("/admin")
-	// Add admin authentication middleware here when available
-	// admin.Use(middleware.AdminRequired())
-
-	// Logs routes
-	admin.GET("/logs", logsController.GetLogsHandler)
-	admin.GET("/logs/user/:user_id", logsController.GetUserActivityHandler)
-	admin.GET("/logs/system", logsController.GetSystemLogsHandler)
-	admin.GET("/logs/stats", logsController.GetLogStatsHandler)
-	admin.GET("/logs/export", logsController.ExportLogsHandler)
-	admin.GET("/logs/range", logsController.GetLogsByDateRangeHandler)
+	hostelOffice.GET("/logs", logsController.GetLogsHandler)
+	hostelOffice.GET("/logs/user/:user_id", logsController.GetUserActivityHandler)
+	hostelOffice.GET("/logs/system", logsController.GetSystemLogsHandler)
+	hostelOffice.GET("/logs/stats", logsController.GetLogStatsHandler)
+	hostelOffice.GET("/logs/export", logsController.ExportLogsHandler)
+	hostelOffice.GET("/logs/range", logsController.GetLogsByDateRangeHandler)
 
 	return r
 }
