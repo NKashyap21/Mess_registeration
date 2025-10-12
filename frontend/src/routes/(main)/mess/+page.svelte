@@ -1,5 +1,68 @@
 <script lang="ts">
+	import Button from '$lib/components/common/Button.svelte';
+	import CustomSelect from '$lib/components/common/CustomSelect.svelte';
 	import MainPanelHeader from '$lib/components/common/MainPanelHeader.svelte';
+	import successSvg from '$lib/assets/success.svg';
+	import failedSvg from '$lib/assets/failed.svg';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import { Dialog } from 'bits-ui';
+	let messValue = $state('Choose a mess');
+	let messTimeValue = $state('Time');
+	const messSelectItems = [
+		{ label: 'Mess A', value: 'Mess A' },
+		{ label: 'Mess B', value: 'Mess B' }
+	];
+	const messTimeItems = [
+		{ label: 'Breakfast', value: 'Breakfast' },
+		{ label: 'Lunch', value: 'Lunch' },
+		{ label: 'Snack', value: 'Snack' },
+		{ label: 'Dinner', value: 'Dinner' }
+	];
+	let success = $state(true);
+	let scanText = $state('Failed');
 </script>
 
 <MainPanelHeader>Dining Scan</MainPanelHeader>
+
+<div class="mt-16 flex flex-row px-32">
+	<section class="flex flex-col">
+		<div class="mb-36 grid grid-cols-2 items-center gap-y-6 text-xl font-medium">
+			<p>Roll No.:</p>
+			<input
+				type="text"
+				class="inline-block w-[12rem] rounded-md px-4 py-3 leading-0 outline outline-custom-dark-grey dark:bg-custom-mid-grey dark:outline-custom-light-grey"
+			/>
+			<p>Student Name:</p>
+			<p>Smaron Boruah</p>
+			<p>Registered Mess</p>
+			<p>Mess B - UDH</p>
+		</div>
+		<div class="flex gap-x-8">
+			<CustomSelect value={messValue} items={messSelectItems} />
+			<CustomSelect value={messTimeValue} widthClass="!w-[8rem]" items={messTimeItems} />
+		</div>
+	</section>
+	<section class="flex flex-col items-center pl-56">
+		<div class="flex *:size-16">
+			{#if success}
+				<img src={successSvg} alt="success svg" />
+			{:else}
+				<img src={failedSvg} alt="failed svg" />
+			{/if}
+		</div>
+		<div class="flex h-fit flex-col">
+			<p class="text-xl font-bold">{success ? 'Successful' : 'Failed'}</p>
+		</div>
+
+		<Modal buttonText="Flag ID Card" class="mt-auto !text-xl">
+			<div class="flex flex-col items-center px-8 py-4">
+				<p class="mb-10 text-3xl font-medium">Flag ID?</p>
+
+				<CustomSelect value={'Reason'} items={messTimeItems} />
+				<Dialog.Close>
+					<Button class="mt-8 !px-16 !py-1.5">Yes</Button>
+				</Dialog.Close>
+			</div>
+		</Modal>
+	</section>
+</div>
