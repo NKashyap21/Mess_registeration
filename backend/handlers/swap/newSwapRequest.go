@@ -45,8 +45,44 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 		return
 	}
 
-	swapRequest.UserID = userID
+	// Check if there is a public request already floating with the opposite direction
+	// If yes, auto accept both requests and update mess of both users
+	var oppositeRequest models.SwapRequest
+	err = sc.DB.First(&oppositeRequest, "direction = ? AND is_accepted = ?",
+		map[string]string{"A to B": "B to A", "B to A": "A to B"}[swapRequest.Direction], false).Error
+	if err == nil {
+		// Found an opposite request, auto accept both
+		swapRequest.Completed = true
+		oppositeRequest.Completed = true
+		err = sc.DB.Save(&oppositeRequest).Error
+		if err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update opposite swap request")
+			return
+		}
 
+		// Update mess of both users
+		var oppositeUser models.User
+		err = sc.DB.First(&oppositeUser, "id = ?", oppositeRequest.UserID).Error
+		if err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch opposite user info")
+			return
+		}
+		
+		user.Mess, oppositeUser.Mess = oppositeUser.Mess, user.Mess
+		err = sc.DB.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Save(&user).Error; err != nil {
+				return err
+			}
+			if err := tx.Save(&oppositeUser).Error; err != nil {
+				return err
+			}
+			return nil
+		})
+		if err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update users' mess")
+			return
+		}
+	}
 	err = sc.DB.Create(&swapRequest).Error
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create swap request")
