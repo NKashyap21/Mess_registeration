@@ -36,8 +36,10 @@ then from next month onwards they shift current regirstations
 EXTRA
 
 4. Mess Rebate
+<!-- Not implemented because now fee structure already gives you rebate -->
 
-5. Mess Safety
+6. Mess Safety
+<!-- What?? -->
 
 ---
 

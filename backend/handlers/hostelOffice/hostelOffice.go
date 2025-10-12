@@ -5,22 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
-
-type OfficeController struct {
-	DB *gorm.DB
-}
-
-func InitOfficeController() *OfficeController {
-	return &OfficeController{
-		DB: config.GetDB(),
-	}
-}
 
 func (oc *OfficeController) GetStudents(c *gin.Context) {
 	//Returns the name,roll_no,email,mess of all the studnets.

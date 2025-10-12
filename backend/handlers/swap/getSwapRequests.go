@@ -12,7 +12,11 @@ func (sc *SwapController) GetAllSwapRequestsHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 
 	var swapRequests []models.SwapRequest
-	err := sc.DB.Where("user_id != ?", userID).Find(&swapRequests).Error
+	err := sc.DB.Table("swap_requests").
+		Select("swap_requests.*, users.email, users.name").
+		Joins("join users on users.id = swap_requests.user_id").
+		Where("swap_requests.user_id != ?", userID).
+		Find(&swapRequests).Error
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch swap requests")
 		return

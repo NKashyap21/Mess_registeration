@@ -3,22 +3,11 @@ package swap
 import (
 	"net/http"
 
-	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
-
-type SwapController struct {
-	DB *gorm.DB
-}
-
-func InitSwapController() *SwapController {
-	return &SwapController{
-		DB: config.GetDB(),
-	}
-}
 
 func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)

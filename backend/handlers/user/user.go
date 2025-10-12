@@ -3,22 +3,10 @@ package user
 import (
 	"net/http"
 
-	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
-
-type UserController struct {
-	DB *gorm.DB
-}
-
-func InitUserController() *UserController {
-	return &UserController{
-		DB: config.GetDB(),
-	}
-}
 
 func (u *UserController) GetUserInfoHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)

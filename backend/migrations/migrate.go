@@ -9,12 +9,13 @@ import (
 
 func MigrateDB() error {
 	db := config.GetDB()
-	
+
 	log.Printf("Starting database migration...")
 	err := db.AutoMigrate(
 		&models.User{},
+		&models.LoggerDetails{}, // Add logs table
 	)
-	
+
 	if err != nil {
 		log.Printf("Error occurred during database migration: %v", err)
 		return err

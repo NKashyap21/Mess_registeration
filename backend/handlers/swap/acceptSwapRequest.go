@@ -14,6 +14,25 @@ func (sc *SwapController) AcceptSwapRequestHandler(c *gin.Context) {
 	var selectedSwapRequest models.SwapRequest
 	utils.ParseJSONRequest(c, &selectedSwapRequest)
 
+	var user models.User
+	if err := sc.DB.First(&user, userID).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "User not found")
+		return
+	}
+	
+	// User does not have a mess assigned, cannot swap to null
+	if user.Mess == 0 {
+		utils.RespondWithError(c, http.StatusBadRequest, "User does not have a mess assigned")
+		return
+	}
+	
+	// Check if user has already swapped mess once
+	var existingSwap models.SwapRequest
+	if err := sc.DB.First(&existingSwap, "user_id = ? AND completed = ?", userID, true).Error; err == nil {
+		utils.RespondWithError(c, http.StatusForbidden, "User has already swapped mess once")
+		return
+	}
+
 	// Two options, either the user is accepting a friend request or a public request
 	switch selectedSwapRequest.Type {
 	case "friend":

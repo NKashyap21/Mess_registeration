@@ -4,6 +4,7 @@ import (
 	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/handlers/auth"
 	hosteloffice "github.com/LambdaIITH/mess_registration/handlers/hostelOffice"
+	"github.com/LambdaIITH/mess_registration/handlers/logs"
 	"github.com/LambdaIITH/mess_registration/handlers/registration"
 	"github.com/LambdaIITH/mess_registration/handlers/staff"
 	"github.com/LambdaIITH/mess_registration/handlers/status"
@@ -20,8 +21,9 @@ func SetupRouter() *gin.Engine {
 
 	// Add global middleware
 	r.Use(middleware.CORS())
-	r.Use(middleware.Logger())
-	r.Use(middleware.Recovery())
+	r.Use(middleware.Logger())         // Console logging with panic recovery
+	r.Use(middleware.DatabaseLogger()) // Database logging
+	r.Use(middleware.Recovery())       // Additional recovery middleware
 
 	// API group with /api prefix
 	api := r.Group("/api")
@@ -34,6 +36,7 @@ func SetupRouter() *gin.Engine {
 	swapController := swap.InitSwapController()
 	staffController := staff.InitStaffController()
 	officeController := hosteloffice.InitOfficeController()
+	logsController := logs.InitLogsController()
 
 	// Health check routes
 	api.GET("/health", healthController.CheckHealth)
@@ -42,22 +45,45 @@ func SetupRouter() *gin.Engine {
 	students := api.Group("/students")
 	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
 	students.GET("/getUser", userController.GetUserInfoHandler)
-	students.POST("/registerMess", registrationController.MessRegistrationHandler)
+	students.POST("/registerMess/:mess", registrationController.MessRegistrationHandler)
+	students.POST("/registerVegMess", registrationController.VegMessRegistrationHandler)
+	students.GET("/getMess", registrationController.GetUserMessHandler)
+	students.GET("/messStats", registrationController.GetMessStatsHandler)
+	students.GET("/messStatsGrouped", registrationController.GetMessStatsGroupedHandler)
 	students.GET("/getSwaps", swapController.GetAllSwapRequestsHandler)
 	students.POST("/createSwap", swapController.CreateSwapRequestHandler)
 	students.DELETE("/deleteSwap", swapController.DeleteSwapHandler)
 	students.POST("/acceptSwap", swapController.AcceptSwapRequestHandler)
 
 	messStaff := api.Group("/messStaff")
+	messStaff.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
+	messStaff.Use(middleware.MessStaffMiddleware(config.GetDB()))
+
+	messStaff.GET("/info", staffController.GetStaffInfo)
 	messStaff.GET("/scanning", staffController.ScanningHandler)
 
 	hostelOffice := api.Group("/office")
-	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
+	hostelOffice.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
 	hostelOffice.Use(middleware.HostelOfficeMiddleWare(config.GetDB()))
 
 	hostelOffice.GET("/students", officeController.GetStudents)
 	hostelOffice.GET("/students/:roll_no", officeController.GetStudentsByID)
 	hostelOffice.PUT("/students/", officeController.EditStudentById)
+	hostelOffice.POST("/refreshCapacities", registrationController.RefreshCapacitiesHandler)
+	hostelOffice.GET("/messStatsGrouped", registrationController.GetMessStatsGroupedHandler)
+
+	// Admin routes for logs (should be protected with admin middleware)
+	admin := api.Group("/admin")
+	// Add admin authentication middleware here when available
+	// admin.Use(middleware.AdminRequired())
+
+	// Logs routes
+	admin.GET("/logs", logsController.GetLogsHandler)
+	admin.GET("/logs/user/:user_id", logsController.GetUserActivityHandler)
+	admin.GET("/logs/system", logsController.GetSystemLogsHandler)
+	admin.GET("/logs/stats", logsController.GetLogStatsHandler)
+	admin.GET("/logs/export", logsController.ExportLogsHandler)
+	admin.GET("/logs/range", logsController.GetLogsByDateRangeHandler)
 
 	return r
 }
