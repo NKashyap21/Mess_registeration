@@ -99,8 +99,8 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 	// Only accept requests on this endpoint at a specified date
 	// Check if the current date is within the registration period
-	if !m.isRegistrationOpen() {
-		utils.RespondWithError(c, http.StatusForbidden, "Registration is not open at this time")
+	if !m.isVegRegistrationOpen() {
+		utils.RespondWithError(c, http.StatusForbidden, " Veg Registration is not open at this time")
 		return
 	}
 
@@ -153,12 +153,12 @@ func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 			registered = true
 			break
 		} else {
-			registrationErrs = append(registrationErrs, "Mess "+strconv.Itoa(mess)+": Registration failed due to capacity or conflict")
+			registrationErrs = append(registrationErrs, "Mess "+strconv.Itoa(mess)+": Veg Registration failed due to capacity or conflict")
 		}
 	}
 
 	if !registered {
-		utils.RespondWithError(c, http.StatusBadRequest, fmt.Sprintf("Registration failed: %v", registrationErrs))
+		utils.RespondWithError(c, http.StatusBadRequest, fmt.Sprintf("Veg Registration failed: %v", registrationErrs))
 		return
 	}
 
@@ -242,10 +242,6 @@ func (m *MessController) RefreshCapacitiesHandler(c *gin.Context) {
 	})
 }
 
-func isValidMess(mess int) bool {
-	return mess >= 1 && mess < 5
-}
-
 func (m *MessController) isRegistrationOpen() bool {
 	// Get the start date from the database
 	var registrationDetails models.MessRegistrationDetails
@@ -255,5 +251,17 @@ func (m *MessController) isRegistrationOpen() bool {
 
 	// Check if the current date is within the registration period
 	currentTime := time.Now()
-	return currentTime.After(registrationDetails.StartTime) && currentTime.Before(registrationDetails.EndTime)
+	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
+}
+
+func (m *MessController) isVegRegistrationOpen() bool {
+	// Get the start date from the database
+	var registrationDetails models.MessRegistrationDetails
+	if err := m.DB.First(&registrationDetails).Error; err != nil {
+		return false
+	}
+
+	// Check if the current date is within the registration period
+	currentTime := time.Now()
+	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
 }
