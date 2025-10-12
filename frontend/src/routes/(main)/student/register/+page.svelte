@@ -7,7 +7,11 @@
 	};
 </script>
 
-<form class="flex flex-col gap-y-16 px-16 py-16 **:text-center dark:text-white" method="post">
+<form
+	class="flex flex-col gap-y-16 px-16 py-16 **:text-center dark:text-white"
+	method="post"
+	action="?/asd"
+>
 	<h1 class="absolute top-12 right-0 left-0 mx-auto w-fit text-[2.5rem] font-semibold">
 		Mess Registration
 	</h1>
