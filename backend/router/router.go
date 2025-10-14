@@ -40,7 +40,9 @@ func SetupRouter() *gin.Engine {
 
 	// Health check routes
 	api.GET("/health", healthController.CheckHealth)
-	api.POST("/login", authController.GoogleLoginHandler)
+	api.GET("/login", authController.GoogleLoginRedirect)
+	api.GET("/login-code", authController.GoogleLoginHandler)
+	// api.POST("/login", authController.GoogleLoginHandler)
 
 	students := api.Group("/students")
 	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))

@@ -13,10 +13,10 @@ services:
       - backend
 
   backend:
-    image: muqeeth26832/mess-registration-backend:latest
-    # build:
-    #   context: ./backend
-    #   dockerfile: ./Dockerfile
+    # image: muqeeth26832/mess-registration-backend:latest
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
     container_name: mess_registration_backend
     depends_on:
       - db
@@ -53,10 +53,10 @@ services:
       - frontend
 
   frontend:
-    image: muqeeth26832/mess-registration-frontend:latest
-    # build:
-    #   context: ./frontend
-    #   dockerfile: ./Dockerfile
+    # image: muqeeth26832/mess-registration-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
     container_name: mess_registration_frontend
     depends_on:
       - backend
