@@ -6,6 +6,8 @@
 	import { colorScheme } from '$lib/state/dark.svelte';
 	import googleIcon from '$lib/assets/google.webp';
 	import { page } from '$app/state';
+	import { PUBLIC_API_URL } from '$env/static/public';
+	import { goto } from '$app/navigation';
 </script>
 
 <header class="flex w-full items-center px-12 pt-6">
@@ -25,6 +27,14 @@
 
 		{#if page.url.pathname != '/login'}
 			<button
+				onclick={() => {
+					fetch(PUBLIC_API_URL + '/logout', {
+						method: 'POST',
+						credentials: 'include'
+					}).finally(() => {
+						goto('/login');
+					});
+				}}
 				class="flex flex-row items-center gap-x-4 rounded-md bg-white px-8 py-5 text-xl font-semibold text-custom-black shadow-xs shadow-custom-dark-grey hover:brightness-95 active:scale-[99%] active:brightness-90 dark:bg-custom-dark-grey dark:text-white"
 			>
 				<img src={googleIcon} class="size-8" alt="google icon" />

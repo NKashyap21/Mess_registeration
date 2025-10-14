@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,12 +19,14 @@ func TokenRequired(db *gorm.DB, c *gin.Context) gin.HandlerFunc {
 		var tokenString string
 
 		// Fallback: try to get token from Authorization header for Safari compatibility
-		authHeader := c.Request.Header.Get("Authorization")
-		if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
-			tokenString = authHeader[7:]
-		}
+		// authHeader := c.Request.Header.Get("Authorization")
+		// if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		// 	tokenString = authHeader[7:]
+		// }
+		tokenString, err := c.Cookie("jwt")
+		fmt.Println(tokenString)
 
-		if tokenString == "" {
+		if err == http.ErrNoCookie {
 			utils.RespondWithError(c, http.StatusUnauthorized, "Token is missing!")
 			return
 		}

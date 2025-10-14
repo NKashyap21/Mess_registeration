@@ -25,6 +25,10 @@ func (a *AuthController) GoogleLoginRedirect(c *gin.Context) {
 	})
 }
 
+func (a *AuthController) Logout(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", os.Getenv("FRONTEND_URL"), false, true)
+}
+
 func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 	logger := services.GetLoggerService()
 
@@ -80,17 +84,17 @@ func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 
 	// Generate JWT token
 	var tokenString string
-	if tokenString, err = services.GenerateJWT(user.ID, email.(string), jwtData["picture"].(string), jwtData["name"].(string), config.GetJWTConfig().SecretKey); err != nil {
+	if tokenString, err = services.GenerateJWT(user.ID, user.Type, email.(string), jwtData["name"].(string), jwtData["picture"].(string), config.GetJWTConfig().SecretKey); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Error creating token")
 		logger.LogAuthAction(user.ID, "LOGIN_FAILED", "Error generating JWT token", c.ClientIP())
 		return
 	}
 	//
-	// // Log successful login
+	// Log successful login
 	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("User %s logged in successfully", email), c.ClientIP())
 
 	c.SetCookie("jwt", tokenString, int(jwtData["exp"].(float64)-jwtData["iat"].(float64)), "/", os.Getenv("FRONTEND_URL"), false, true)
-	c.Redirect(303, os.Getenv("FRONTEND_URL"))
+	c.Redirect(http.StatusSeeOther, os.Getenv("FRONTEND_URL"))
 
 	// utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 	// 	Message: "Login successful",

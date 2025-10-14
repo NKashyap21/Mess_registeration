@@ -6,16 +6,17 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(userID uint, email string, name string, picture string, secretKey string) (string, error) {
+func GenerateJWT(userID uint, userType int8, email string, name string, picture string, secretKey string) (string, error) {
 
 	expirationTime := time.Now().Add(72 * time.Hour)
 
 	claims := &jwt.MapClaims{
-		"user_id": userID,
-		"email":   email,
-		"picture": picture,
-		"name":    name,
-		"exp":     expirationTime.Unix(),
+		"user_id":   userID,
+		"user_type": userType,
+		"email":     email,
+		"picture":   picture,
+		"name":      name,
+		"exp":       expirationTime.Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
