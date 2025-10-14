@@ -2,8 +2,9 @@ import { redirect } from '@sveltejs/kit';
 import { OAuth2Client } from 'google-auth-library';
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
 import { goto } from '$app/navigation';
+import type { RequestHandler } from './$types';
 
-export const GET = async ({ url }) => {
+export const GET: RequestHandler = async ({ url }) => {
 	// const redirectURL = 'http://localhost:5173/oauth';
 	const redirectURL = 'http://localhost:3000/oauth';
 	const code = await url.searchParams.get('code');
@@ -20,7 +21,7 @@ export const GET = async ({ url }) => {
 		console.log('Credentials:', user);
 
 		// Send id_token to your backend
-		const loginToBackend = async (idToken) => {
+		const loginToBackend = async (idToken: string) => {
 			const res = await fetch('http://localhost:8080/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

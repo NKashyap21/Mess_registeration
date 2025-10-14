@@ -15,6 +15,7 @@
 		<button
 			onclick={() => {
 				colorScheme.dark = !colorScheme.dark;
+				localStorage.setItem('colorDark', colorScheme.dark ? '1' : '0');
 			}}
 			class="h-fit hover:cursor-pointer"
 		>
