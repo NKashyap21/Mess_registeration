@@ -1,25 +1,34 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Button from '$lib/components/common/Button.svelte';
 	import Progress from '$lib/components/common/Progress.svelte';
 
-	const messData: Record<string, string[]> = {
-		'Mess-A': ['LDH', 'UDH'],
-		'Mess-B': ['LDH', 'UDH']
-	};
-
-	let { data } = $props();
-	console.log(data.messStats);
+	let { data, form } = $props();
+	$effect(() => {
+		if (form != undefined) {
+			if (form.message == undefined) {
+				alert(form.error);
+			} else {
+				alert(form.message);
+			}
+		}
+	});
 </script>
 
-<form class="flex flex-col gap-y-16 px-16 pt-16 **:text-center dark:text-white" method="post">
+<form
+	use:enhance
+	class="flex flex-col gap-y-16 px-16 pt-16 **:text-center dark:text-white"
+	method="post"
+>
 	<h1 class="absolute top-12 right-0 left-0 mx-auto w-fit text-[2.5rem] font-semibold">
 		Mess Registration
 	</h1>
-	{#each Object.keys(messData) as messName}
+	<input hidden value={data.regData.veg} name="veg" />
+	{#each Object.keys(data.messStats.stats) as messName}
 		<section class="flex flex-row">
 			<h2 class="mr-12 w-[8rem] text-3xl font-bold">{messName}</h2>
 			<div class="flex flex-col gap-y-12">
-				{#each messData[messName] as hall, idx}
+				{#each Object.keys(data.messStats.stats[messName]) as hall, idx}
 					<div class="flex items-center">
 						<h3 class="w-[8rem] text-2xl">{hall}</h3>
 						<Progress
@@ -29,8 +38,16 @@
 								: 'bg-custom-light-orange'}
 							value={1}
 						/>
-						<h3 class="px-6 text-2xl font-medium">1000/2500</h3>
-						<input class="" type="radio" name="mess" value={hall} />
+						<h3 class="px-6 text-2xl font-medium">
+							{data.messStats.stats[messName][hall].count}/{data.messStats.stats[messName][hall]
+								.capacity}
+						</h3>
+						<input
+							class=""
+							type="radio"
+							name="mess"
+							value={data.messStats.stats[messName][hall].id}
+						/>
 					</div>
 				{/each}
 			</div>

@@ -5,6 +5,7 @@
 
 	let { data } = $props();
 	let registered = $state(data.user.mess_id != 'No mess assigned');
+	console.log(data);
 </script>
 
 <MainPanelHeader>Mess Portal</MainPanelHeader>

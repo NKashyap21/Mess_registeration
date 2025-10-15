@@ -20,7 +20,13 @@ export const load: LayoutServerLoad = async ({ fetch }) => {
 	return {
 		user: userData,
 		regData: await (
-			await fetch(PUBLIC_API_URL + '/students/isRegistrationOpen', { method: 'GET' })
+			await fetch(PUBLIC_API_URL + '/students/isRegistrationOpen', {
+				method: 'GET',
+				credentials: 'include'
+			})
+		).json(),
+		userMessData: await (
+			await fetch(PUBLIC_API_URL + '/students/getMess', { method: 'GET', credentials: 'include' })
 		).json()
 	};
 };
