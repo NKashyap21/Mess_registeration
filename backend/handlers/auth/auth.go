@@ -19,14 +19,97 @@ import (
 
 // TODO: state param for csrf
 func (a *AuthController) GoogleLoginRedirect(c *gin.Context) {
+	// Handle mobile POST request with ID token
+	if c.Request.Method == "POST" {
+		a.handleMobileLogin(c)
+		return
+	}
+
+	// Original GET request for web OAuth redirect
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 		Message: "Redirect Url",
 		Data:    gin.H{"redirect": fmt.Sprintf("https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=%s&scope=openid%%20profile%%20email&redirect_uri=%s", os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("BACKEND_URL")+"/api/login-code")},
 	})
 }
 
+func (a *AuthController) handleMobileLogin(c *gin.Context) {
+	logger := services.GetLoggerService()
+
+	var payload struct {
+		Token string `json:"token"`
+	}
+
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid JSON payload", c.ClientIP())
+		return
+	}
+
+	if payload.Token == "" {
+		utils.RespondWithError(c, http.StatusBadRequest, "Token is required")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Empty token", c.ClientIP())
+		return
+	}
+
+	parts := strings.Split(payload.Token, ".")
+	if len(parts) != 3 {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid token format")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid token format", c.ClientIP())
+		return
+	}
+
+	decoded, err := base64.RawStdEncoding.DecodeString(parts[1])
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Failed to decode token")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Token decode error", c.ClientIP())
+		return
+	}
+
+	var jwtData map[string]any
+	if err := json.Unmarshal(decoded, &jwtData); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Failed to parse token")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Token parse error", c.ClientIP())
+		return
+	}
+
+	email, ok := jwtData["email"].(string)
+	if !ok || email == "" {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid email in token")
+		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid email", c.ClientIP())
+		return
+	}
+
+	var user models.User
+	if err := a.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		utils.RespondWithError(c, http.StatusUnauthorized, "User not found")
+		logger.LogAuthAction(0, "LOGIN_FAILED", fmt.Sprintf("User not found: %s", email), c.ClientIP())
+		return
+	}
+
+	tokenString, err := services.GenerateJWT(user.ID, user.Type, email, jwtData["name"].(string), jwtData["picture"].(string), config.GetJWTConfig().SecretKey)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Error creating token")
+		logger.LogAuthAction(user.ID, "LOGIN_FAILED", "JWT generation error", c.ClientIP())
+		return
+	}
+
+	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("Mobile login: %s", email), c.ClientIP())
+
+	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
+		Message: "Login successful",
+		Data:    gin.H{"token": tokenString, "user": user},
+	})
+}
+
 func (a *AuthController) Logout(c *gin.Context) {
+	// Clear the JWT cookie for web clients
 	c.SetCookie("jwt", "", -1, "/", os.Getenv("FRONTEND_URL"), false, true)
+
+	// Return JSON response for mobile clients
+	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
+		Message: "Logout successful",
+		Data:    nil,
+	})
 }
 
 func (a *AuthController) GoogleLoginHandler(c *gin.Context) {

@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mess_registration
-    ports:
-      - "5433:5432"
+    # ports:
+    #   - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -17,7 +17,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
     container_name: mess_registration_backend
     volumes:
       - ./backend:/app
@@ -33,20 +33,20 @@ services:
       - backend
       - frontend
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile.dev
-    container_name: mess_registration_frontend
-    depends_on:
-      - backend
-    ports:
-      - "3000:3000"
-    networks:
-      - frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: ./Dockerfile.dev
+  #   container_name: mess_registration_frontend
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - "5173:5173"
+  #   networks:
+  #     - frontend
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
 
 volumes:
   postgres_data:

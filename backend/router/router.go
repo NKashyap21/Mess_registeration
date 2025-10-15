@@ -41,6 +41,7 @@ func SetupRouter() *gin.Engine {
 	// Health check routes
 	api.GET("/health", healthController.CheckHealth)
 	api.GET("/login", authController.GoogleLoginRedirect)
+	api.POST("/login", authController.GoogleLoginRedirect) // For mobile ID token login
 	api.POST("/logout", authController.Logout)
 	api.GET("/login-code", authController.GoogleLoginHandler)
 	api.GET("/getUser", middleware.TokenRequired(config.GetDB(), &gin.Context{}), userController.GetUserInfoHandler)
