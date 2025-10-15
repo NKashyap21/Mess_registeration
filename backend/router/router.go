@@ -55,6 +55,7 @@ func SetupRouter() *gin.Engine {
 	students.GET("/messStats", registrationController.GetMessStatsHandler)
 	students.GET("/messStatsGrouped", registrationController.GetMessStatsGroupedHandler)
 	students.GET("/getSwaps", swapController.GetAllSwapRequestsHandler)
+	students.GET("/getSwapByID", swapController.GetSwapRequestsByID)
 	students.POST("/createSwap", swapController.CreateSwapRequestHandler)
 	students.DELETE("/deleteSwap", swapController.DeleteSwapHandler)
 	students.POST("/acceptSwap", swapController.AcceptSwapRequestHandler)

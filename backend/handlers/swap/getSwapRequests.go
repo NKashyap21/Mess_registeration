@@ -6,6 +6,7 @@ import (
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (sc *SwapController) GetAllSwapRequestsHandler(c *gin.Context) {
@@ -28,3 +29,22 @@ func (sc *SwapController) GetAllSwapRequestsHandler(c *gin.Context) {
 	})
 }
 
+func (sc *SwapController) GetSwapRequestsByID(c *gin.Context) {
+	userID := utils.ValidateSession(c)
+
+	var swapRequest models.SwapRequest
+	err := sc.DB.Where("user_id = ?", userID).First(&swapRequest).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utils.RespondWithError(c, http.StatusNotFound, "No swap request found for the user")
+		} else {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch swap request")
+		}
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
+		Message: "Swap request fetched successfully",
+		Data:    swapRequest,
+	})
+}
