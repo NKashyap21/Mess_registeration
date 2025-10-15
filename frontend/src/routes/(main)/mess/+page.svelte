@@ -6,12 +6,13 @@
 	import failedSvg from '$lib/assets/failed.svg';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { Dialog } from 'bits-ui';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	let messValue = $state('Choose a mess');
 	let messTimeValue = $state('Time');
-	const messSelectItems = [
-		{ label: 'Mess A', value: 'Mess A' },
-		{ label: 'Mess B', value: 'Mess B' }
-	];
+	// const messSelectItems = [
+	// 	{ label: 'Mess A', value: 'Mess A' },
+	// 	{ label: 'Mess B', value: 'Mess B' }
+	// ];
 	const messTimeItems = [
 		{ label: 'Breakfast', value: 'Breakfast' },
 		{ label: 'Lunch', value: 'Lunch' },
@@ -19,7 +20,10 @@
 		{ label: 'Dinner', value: 'Dinner' }
 	];
 	let success = $state(true);
-	let scanText = $state('Failed');
+	let rollNo = $state('');
+	let studentName = $state('');
+	let registeredMess = $state('');
+	let extraText = $state('');
 </script>
 
 <MainPanelHeader>Dining Scan</MainPanelHeader>
@@ -29,16 +33,51 @@
 		<div class="mb-36 grid grid-cols-2 items-center gap-y-6 text-xl font-medium">
 			<p>Roll No.:</p>
 			<input
+				bind:value={rollNo}
+				onkeydown={async (ev) => {
+					if (ev.key == 'Enter') {
+						const res = await fetch(
+							PUBLIC_API_URL + '/messStaff/scanning?roll_no=' + rollNo.trim(),
+							{
+								method: 'GET',
+								credentials: 'include'
+							}
+						);
+
+						const jsondata = await res.json();
+						if (res.status == 200) {
+							success = true;
+						} else {
+							success = false;
+						}
+						if (Object.keys(jsondata).includes('data')) {
+							rollNo = jsondata['data']['user']['roll_no'];
+							studentName = jsondata['data']['user']['name'];
+							const messId = jsondata['data']['user']['mess'];
+							if (messId == 1) {
+								registeredMess = 'Mess A - LDH';
+							} else if (messId == 2) {
+								registeredMess = 'Mess A - UDH';
+							} else if (messId == 3) {
+								registeredMess = 'Mess B - LDH';
+							} else if (messId == 4) {
+								registeredMess = 'Mess B - UDH';
+							}
+						}
+						extraText = jsondata.message;
+						rollNo = '';
+					}
+				}}
 				type="text"
 				class="inline-block w-[12rem] rounded-md px-4 py-3 leading-0 outline outline-custom-dark-grey dark:bg-custom-mid-grey dark:outline-custom-light-grey"
 			/>
 			<p>Student Name:</p>
-			<p>Smaron Boruah</p>
+			<p>{studentName}</p>
 			<p>Registered Mess</p>
-			<p>Mess B - UDH</p>
+			<p>{registeredMess}</p>
 		</div>
 		<div class="flex gap-x-8">
-			<CustomSelect value={messValue} items={messSelectItems} />
+			<!-- <CustomSelect value={messValue} items={messSelectItems} /> -->
 			<CustomSelect value={messTimeValue} widthClass="!w-[8rem]" items={messTimeItems} />
 		</div>
 	</section>
@@ -50,8 +89,9 @@
 				<img src={failedSvg} alt="failed svg" />
 			{/if}
 		</div>
-		<div class="flex h-fit flex-col">
-			<p class="text-xl font-bold">{success ? 'Successful' : 'Failed'}</p>
+		<div class="flex h-fit flex-col items-center">
+			<p class="mt-4 text-xl font-bold">{success ? 'Successful' : 'Failed'}</p>
+			<p class="mt-2 text-lg">{extraText}</p>
 		</div>
 
 		<Modal buttonText="Flag ID Card" class="mt-auto !text-xl">

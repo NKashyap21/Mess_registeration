@@ -65,6 +65,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	if user.Mess == 0 {
 		utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 			Message: "User does not have a mess assigned",
+			Data:    gin.H{"user": user},
 		})
 		return
 	}
@@ -84,6 +85,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		if user.Mess != 1 && user.Mess != 2 {
 			utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 				Message: "User does not have access to Mess A",
+				Data:    gin.H{"user": user},
 			})
 			return
 		}
@@ -91,6 +93,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		if user.Mess != 3 && user.Mess != 4 {
 			utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 				Message: "User does not have access to Mess B",
+				Data:    gin.H{"user": user},
 			})
 			return
 		}
