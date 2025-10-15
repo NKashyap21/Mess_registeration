@@ -6,6 +6,9 @@
 		'Mess-A': ['LDH', 'UDH'],
 		'Mess-B': ['LDH', 'UDH']
 	};
+
+	let { data } = $props();
+	console.log(data.messStats);
 </script>
 
 <form class="flex flex-col gap-y-16 px-16 pt-16 **:text-center dark:text-white" method="post">

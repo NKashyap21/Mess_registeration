@@ -17,5 +17,10 @@ export const load: LayoutServerLoad = async ({ fetch }) => {
 			throw redirect(307, '/admin');
 		}
 	}
-	return;
+	return {
+		user: userData,
+		regData: await (
+			await fetch(PUBLIC_API_URL + '/students/isRegistrationOpen', { method: 'GET' })
+		).json()
+	};
 };

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,6 @@ func TokenRequired(db *gorm.DB, c *gin.Context) gin.HandlerFunc {
 		// 	tokenString = authHeader[7:]
 		// }
 		tokenString, err := c.Cookie("jwt")
-		fmt.Println(tokenString)
 
 		if err == http.ErrNoCookie {
 			utils.RespondWithError(c, http.StatusUnauthorized, "Token is missing!")
