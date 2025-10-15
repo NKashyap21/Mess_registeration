@@ -3,7 +3,8 @@
 	import Button from '$lib/components/common/Button.svelte';
 	import MainPanelHeader from '$lib/components/common/MainPanelHeader.svelte';
 
-	let registered = $state(false);
+	let { data } = $props();
+	let registered = $state(data.user.mess_id != 'No mess assigned');
 </script>
 
 <MainPanelHeader>Mess Portal</MainPanelHeader>
@@ -12,18 +13,25 @@
 	class="grid grid-cols-2 gap-x-8 gap-y-14 px-24 pt-24 pb-6 text-3xl leading-none font-medium text-custom-black dark:text-custom-off-white"
 >
 	<p>Current Registered Mess :</p>
-	<p>Unregistered</p>
+	<p>{data.user.mess_id}</p>
 	<p>Next registration date :</p>
 	<p>Today</p>
-	<p>Time left for next registration :</p>
-	<p>Registration Active Now</p>
+	<p>Registration Status :</p>
+	<p>
+		{data.regData.regular
+			? 'Registration Active Now'
+			: data.regData.veg
+				? 'Veg Registration Active Now'
+				: 'Inactive'}
+	</p>
 
-	{#if registered}
+	{#if !registered}
 		<Button
+			disabled={!(data.regData.regular || data.regData.veg)}
 			onclick={() => {
 				goto('student/register');
 			}}
-			class="col-span-2 mx-auto mt-16">Go for Registration</Button
+			class="col-span-2 mx-auto mt-16">Go for {data.regData.veg ? 'Veg' : ''} Registration</Button
 		>
 	{:else}
 		<Button
