@@ -242,6 +242,13 @@ func (m *MessController) RefreshCapacitiesHandler(c *gin.Context) {
 	})
 }
 
+func (m *MessController) IsRegistrationOpen(c *gin.Context) {
+	utils.RespondWithJSON(c, http.StatusOK, map[string]bool{
+		"regular": m.isRegistrationOpen(),
+		"veg":     m.isVegRegistrationOpen(),
+	})
+}
+
 func (m *MessController) isRegistrationOpen() bool {
 	// Get the start date from the database
 	var registrationDetails models.MessRegistrationDetails
