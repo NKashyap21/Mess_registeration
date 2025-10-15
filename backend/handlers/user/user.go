@@ -31,6 +31,7 @@ func (u *UserController) GetUserInfoHandler(c *gin.Context) {
 	default:
 		mess_name = "No mess assigned"
 	}
+	profilePic, _ := c.Get("picture")
 
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 		Message: "User info fetched successfully",
@@ -39,6 +40,7 @@ func (u *UserController) GetUserInfoHandler(c *gin.Context) {
 			"roll_number": user.RollNo,
 			"mess_id":     mess_name,
 			"user_type":   user.Type,
+			"profile_pic": profilePic,
 		},
 	})
 }

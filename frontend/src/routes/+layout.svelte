@@ -4,7 +4,7 @@
 	import Header from '$lib/components/common/Header.svelte';
 	import { colorScheme } from '$lib/state/dark.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <svelte:head>
@@ -16,7 +16,7 @@
 		? 'dark'
 		: ''} w-full flex-col bg-custom-lighter-grey dark:bg-custom-black"
 >
-	<Header />
+	<Header userData={data.user} />
 	<main class="flex h-full w-full grow flex-col items-center justify-center **:transition-colors">
 		{@render children?.()}
 	</main>

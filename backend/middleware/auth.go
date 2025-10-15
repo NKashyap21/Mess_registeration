@@ -68,6 +68,7 @@ func TokenRequired(db *gorm.DB, c *gin.Context) gin.HandlerFunc {
 		// Add user ID to the context for the next handler
 		ctx := context.WithValue(c.Request.Context(), "user_id", userID) //lint:ignore SA1029 ignore context key naming
 		c.Request = c.Request.WithContext(ctx)
+		c.Set("picture", claims["picture"].(string))
 		c.Next()
 	}
 }
