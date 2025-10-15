@@ -1,5 +1,6 @@
 package models
 
 type GoogleLoginData struct {
-	Token string `json:"token" binding:"required"`
+	Code string `form:"code" binding:"required"`
 }
+

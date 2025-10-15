@@ -9,6 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type Server struct {
+
+}
+
+func
+
 func TestHealthEndpoint(t *testing.T) {
 	r := router.SetupRouter()
 

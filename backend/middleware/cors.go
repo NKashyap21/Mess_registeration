@@ -1,13 +1,15 @@
 package middleware
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 )
 
 // CORS middleware to handle Cross-Origin Resource Sharing
 func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Dangerous in production, specify allowed origins
+		c.Writer.Header().Set("Access-Control-Allow-Origin", os.Getenv("FRONTEND_URL")) // Dangerous in production, specify allowed origins
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set(
 			"Access-Control-Allow-Headers",

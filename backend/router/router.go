@@ -40,11 +40,14 @@ func SetupRouter() *gin.Engine {
 
 	// Health check routes
 	api.GET("/health", healthController.CheckHealth)
-	api.POST("/login", authController.GoogleLoginHandler)
+	api.GET("/login", authController.GoogleLoginRedirect)
+	api.POST("/logout", authController.Logout)
+	api.GET("/login-code", authController.GoogleLoginHandler)
+	api.GET("/getUser", middleware.TokenRequired(config.GetDB(), &gin.Context{}), userController.GetUserInfoHandler)
 
 	students := api.Group("/students")
 	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
-	students.GET("/getUser", userController.GetUserInfoHandler)
+	// students.GET("/getUser", userController.GetUserInfoHandler)
 	students.GET("/isRegistrationOpen", registrationController.IsRegistrationOpen)
 	students.POST("/registerMess/:mess", registrationController.MessRegistrationHandler)
 	students.POST("/registerVegMess", registrationController.VegMessRegistrationHandler)
