@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LambdaIITH/mess_registration/models"
+	"github.com/LambdaIITH/mess_registration/state"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -83,6 +84,51 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 		return
 	}
 
-	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Success Updating the usef information."})
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Success Updating the user information."})
+
+}
+func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
+	if !state.GetRegistrationStatusReg() {
+		state.ChangeRegistrationStatusReg(true)
+		utils.RespondWithJSON(c, http.StatusOK, "Regualr Registeration Started.")
+		return
+	} else {
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration has already started.")
+		return
+	}
+}
+
+func (oc *OfficeController) EndRegRegistration(c *gin.Context) {
+	if state.GetRegistrationStatusReg() {
+		state.ChangeRegistrationStatusReg(false)
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration Ended.")
+		return
+	} else {
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration Ended Already.")
+		return
+	}
+
+}
+
+func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
+	if !state.GetRegistrationStatusVeg() {
+		state.ChangeRegistrationStatusVeg(true)
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Started.")
+		return
+	} else {
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration has already started.")
+		return
+	}
+}
+
+func (oc *OfficeController) EndVegRegistration(c *gin.Context) {
+	if state.GetRegistrationStatusVeg() {
+		state.ChangeRegistrationStatusVeg(false)
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Ended.")
+		return
+	} else {
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Ended Already.")
+		return
+	}
 
 }

@@ -49,7 +49,7 @@ func SetupRouter() *gin.Engine {
 	students := api.Group("/students")
 	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
 	// students.GET("/getUser", userController.GetUserInfoHandler)
-	students.GET("/isRegistrationOpen", registrationController.IsRegistrationOpen)
+	students.GET("/", registrationController.IsRegistrationOpen)
 	students.POST("/registerMess/:mess", registrationController.MessRegistrationHandler)
 	students.POST("/registerVegMess", registrationController.VegMessRegistrationHandler)
 	students.GET("/getMess", registrationController.GetUserMessHandler)
@@ -77,6 +77,11 @@ func SetupRouter() *gin.Engine {
 	hostelOffice.PUT("/students/", officeController.EditStudentById)
 	hostelOffice.POST("/refreshCapacities", registrationController.RefreshCapacitiesHandler)
 	hostelOffice.GET("/messStatsGrouped", registrationController.GetMessStatsGroupedHandler)
+
+	hostelOffice.POST("/start-registration/reg", officeController.StartRegRegistration)
+	hostelOffice.POST("/end-registration/reg", officeController.EndRegRegistration)
+	hostelOffice.POST("/start-registration/veg", officeController.StartVegRegistration)
+	hostelOffice.POST("/end-registration/veg", officeController.EndVegRegistration)
 
 	hostelOffice.GET("/logs", logsController.GetLogsHandler)
 	hostelOffice.GET("/logs/user/:user_id", logsController.GetUserActivityHandler)

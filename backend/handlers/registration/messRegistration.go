@@ -8,6 +8,7 @@ import (
 
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/services"
+	"github.com/LambdaIITH/mess_registration/state"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -15,11 +16,8 @@ import (
 func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 	logger := services.GetLoggerService()
 
-	// Only accept requests on this endpoint at a specified date
-	// Check if the current date is within the registration period
-	if !m.isRegistrationOpen() {
-		utils.RespondWithError(c, http.StatusForbidden, "Registration is not open at this time")
-		logger.LogUserAction(0, "MESS_REGISTRATION_FAILED", "Registration attempted when not open", c.ClientIP())
+	if !state.GetRegistrationStatusReg() {
+		utils.RespondWithError(c, http.StatusForbidden, "Registeration Has Ended.")
 		return
 	}
 
@@ -99,11 +97,11 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 	// Only accept requests on this endpoint at a specified date
 	// Check if the current date is within the registration period
-	if !m.isVegRegistrationOpen() {
-		utils.RespondWithError(c, http.StatusForbidden, " Veg Registration is not open at this time")
+
+	if !state.GetRegistrationStatusVeg() {
+		utils.RespondWithJSON(c, http.StatusForbidden, "Registeration Has Ended.")
 		return
 	}
-
 	userID := utils.ValidateSession(c)
 
 	// Check if user exists and can register (from database)
