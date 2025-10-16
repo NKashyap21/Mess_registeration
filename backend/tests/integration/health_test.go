@@ -13,7 +13,7 @@ type Server struct {
 
 }
 
-func
+// func
 
 func TestHealthEndpoint(t *testing.T) {
 	r := router.SetupRouter()

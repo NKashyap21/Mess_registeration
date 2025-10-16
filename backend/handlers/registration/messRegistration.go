@@ -135,8 +135,8 @@ func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	// Veg mess is always mess 1 or 2
-	allowedMesses := []int{1, 2}
+	// Veg mess is always mess 5
+	allowedMesses := []int{5} // Baadme logic expand kar sakte if galti se bhi koi aur mess veg option de diya toh
 
 	var registrationErrs []string
 	registered := false

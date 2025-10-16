@@ -18,5 +18,5 @@ type User struct {
 	CanRegister bool      `json:"can_register" gorm:"default:true"`
 }
 
-// 1 = MessA LDH, 2 = MessA UDH, 3 = MessB LDH, 4 = MessB UDH, 0 = Unassigned
+// 1 = MessA LDH, 2 = MessA UDH, 3 = MessB LDH, 4 = MessB UDH, 5 = Veg Mess (subset of MessA), 0 = Unassigned
 // 0 = Student, 1 = Mess Staff, 2 = Hostel Office
