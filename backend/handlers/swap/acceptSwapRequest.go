@@ -3,6 +3,7 @@ package swap
 import (
 	"net/http"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ func (sc *SwapController) AcceptSwapRequestHandler(c *gin.Context) {
 	}
 	
 	// Check if user has already swapped mess once
-	var existingSwap models.SwapRequest
+	var existingSwap db.SwapRequest
 	if err := sc.DB.First(&existingSwap, "user_id = ? AND completed = ?", userID, true).Error; err == nil {
 		utils.RespondWithError(c, http.StatusForbidden, "User has already swapped mess once")
 		return
@@ -47,7 +48,7 @@ func (sc *SwapController) AcceptSwapRequestHandler(c *gin.Context) {
 
 func (sc *SwapController) acceptPublicSwapRequest(userID uint, selectedSwapRequest models.SwapRequest, c *gin.Context) {
 	// Check if the selected swap request exists and is of type 'public'
-	var existingRequest models.SwapRequest
+	var existingRequest db.SwapRequest
 	if err := sc.DB.First(&existingRequest, "id = ? AND type = ?", selectedSwapRequest.UserID, "public").Error; err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Swap request not found")
 		return

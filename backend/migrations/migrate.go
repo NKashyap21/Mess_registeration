@@ -4,18 +4,18 @@ import (
 	"log"
 
 	"github.com/LambdaIITH/mess_registration/config"
-	"github.com/LambdaIITH/mess_registration/models"
+	"github.com/LambdaIITH/mess_registration/db"
 )
 
 func MigrateDB() error {
-	db := config.GetDB()
+	database := config.GetDB()
 
 	log.Printf("Starting database migration...")
-	err := db.AutoMigrate(
-		&models.User{},
-		&models.LoggerDetails{}, // Add logs table
-		&models.MessRegistrationDetails{},
-		&models.SwapRequest{},
+	err := database.AutoMigrate(
+		&db.User{},
+		&db.LoggerDetails{}, // Add logs table
+		&db.MessRegistrationDetails{},
+		&db.SwapRequest{},
 	)
 
 	if err != nil {

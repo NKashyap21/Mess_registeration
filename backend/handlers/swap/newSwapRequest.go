@@ -17,7 +17,7 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 	utils.ParseJSONRequest(c, &swapRequest)
 
 	// Check if there already exists a swap request for this user
-	var existingRequest models.SwapRequest
+	var existingRequest db.SwapRequest
 	err := sc.DB.First(&existingRequest, "user_id = ?", userID).Error
 	if err == nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Swap request already exists for this user")
