@@ -316,8 +316,8 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 		return
 	}
 
-	currentStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-	upcomingStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	currentStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	upcomingStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
 	for _, s := range stats {
 		currentStats[int(s.Mess)] = int(s.CurrentCount)
@@ -341,21 +341,18 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 			"normal": details.NormalRegistrationOpen,
 		},
 		"capacity": gin.H{
-			"mess_a": gin.H{
-				"ldh": details.MessALDHCapacity,
-				"udh": details.MessAUDHCapacity,
+			"Mess A": gin.H{
+				"LDH": details.MessALDHCapacity,
+				"UDH": details.MessAUDHCapacity,
 			},
-			"mess_b": gin.H{
-				"ldh": details.MessBLDHCapacity,
-				"udh": details.MessBUDHCapacity,
+			"Mess B": gin.H{
+				"LDH": details.MessBLDHCapacity,
+				"UDH": details.MessBUDHCapacity,
 			},
-			"veg_mess": details.VegMessCapacity,
-		},
-		"totals": gin.H{
-			"students_total":                  totalStudents,
-			"can_register":                    totalCanRegister,
-			"can_but_didnt_register":          totalCanButDidntRegister,
-			"can_but_didnt_register_upcoming": totalCanButDidntRegisterUpcoming,
+			"Extra": gin.H{
+				"Veg Mess":   details.VegMessCapacity,
+				"Unassigned": totalCanRegister,
+			},
 		},
 		"current_mess": gin.H{
 			"Mess A": gin.H{
@@ -368,7 +365,7 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 			},
 			"Extra": gin.H{
 				"Veg Mess":   currentStats[5],
-				"Unassigned": currentStats[0],
+				"Unassigned": totalCanButDidntRegister,
 			},
 		},
 		"upcoming_mess": gin.H{
@@ -382,7 +379,7 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 			},
 			"Extra": gin.H{
 				"Veg Mess":   upcomingStats[5],
-				"Unassigned": upcomingStats[0],
+				"Unassigned": totalCanButDidntRegisterUpcoming,
 			},
 		},
 	}
