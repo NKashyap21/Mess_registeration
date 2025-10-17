@@ -2,6 +2,7 @@ package registration
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -257,10 +258,11 @@ func (m *MessController) isRegistrationOpen() bool {
 		return false
 	}
 
+	log.Printf("Start time: %v, End time: %v\n", registrationDetails.NormalRegistrationStart, registrationDetails.NormalRegistrationEnd)
+
 	// Check if the current date is within the registration period
-	// istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	// currentTime := time.Now().In(istLocation)
-	currentTime := time.Now()
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	currentTime := time.Now().In(istLocation)
 	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
 }
 
@@ -270,10 +272,9 @@ func (m *MessController) isVegRegistrationOpen() bool {
 	if err := m.DB.First(&registrationDetails).Error; err != nil {
 		return false
 	}
-	
+
 	// Check if the current date is within the registration period
-	// istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	// currentTime := time.Now().In(istLocation)
-	currentTime := time.Now()
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	currentTime := time.Now().In(istLocation)
 	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
 }
