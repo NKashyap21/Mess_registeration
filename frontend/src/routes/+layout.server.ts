@@ -11,7 +11,7 @@ export const load: LayoutServerLoad = async ({ fetch, url }) => {
 			});
 			if (res.status != 200) {
 				await fetch(PUBLIC_API_URL + '/logout', { method: 'POST', credentials: 'include' });
-				throw redirect(301, '/login');
+				throw redirect(307, '/login');
 			}
 			let userData = await res.json();
 			userData = userData['data'];
@@ -20,7 +20,7 @@ export const load: LayoutServerLoad = async ({ fetch, url }) => {
 			};
 		} catch (e) {
 			console.error(e);
-			throw redirect(301, '/login');
+			throw redirect(307, '/login');
 		}
 	}
 };

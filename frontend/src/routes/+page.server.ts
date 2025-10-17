@@ -12,6 +12,6 @@ export const load: PageServerLoad = async ({ fetch, parent }) => {
 		throw redirect(307, '/admin');
 	} else {
 		await fetch(PUBLIC_API_URL + '/logout', { method: 'POST', credentials: 'include' });
-		throw redirect(301, '/login');
+		throw redirect(307, '/login');
 	}
 };
