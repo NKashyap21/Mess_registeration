@@ -15,6 +15,7 @@ class _SwapScreenState extends State<SwapScreen> {
   List<dynamic> availableSwaps = [];
   String? error;
   Map<String, dynamic>? userInfo;
+  Map<String, dynamic>? userSwapRequest;
 
   final TextEditingController _passwordController = TextEditingController();
   String _requestType = 'public';
@@ -49,11 +50,33 @@ class _SwapScreenState extends State<SwapScreen> {
 
       userInfo = userResponse['data'];
 
+      // Try to get user's existing swap request
+      await _loadUserSwapRequest();
+
       await _loadSwapData();
     } catch (e) {
       setState(() {
         error = 'Failed to load initial data: $e';
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadUserSwapRequest() async {
+    try {
+      final response = await ApiService.getUserSwapRequest();
+      setState(() {
+        if (response['error'] != null) {
+          // No existing swap request is okay, user can create one
+          userSwapRequest = null;
+        } else {
+          userSwapRequest = response['data'];
+        }
+      });
+    } catch (e) {
+      // Error getting user swap request is not critical
+      setState(() {
+        userSwapRequest = null;
       });
     }
   }
@@ -112,7 +135,9 @@ class _SwapScreenState extends State<SwapScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildCreateRequestSection(),
+                          userSwapRequest != null
+                              ? _buildCurrentSwapRequestSection()
+                              : _buildCreateRequestSection(),
                           const SizedBox(height: 40),
                           _buildAvailableSwapsSection(),
                         ],
@@ -144,6 +169,83 @@ class _SwapScreenState extends State<SwapScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCurrentSwapRequestSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Your Current Swap Request',
+          style: TextStyle(
+            color: AppColors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.black,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildInfoField(
+                    'Type',
+                    userSwapRequest!['type'] ?? 'Unknown',
+                  ),
+                  _buildInfoField(
+                    'Direction',
+                    userSwapRequest!['direction'] ?? 'Unknown',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              if (userSwapRequest!['type'] == 'friend') ...[
+                _buildInfoField(
+                  'Password',
+                  userSwapRequest!['password'] ?? 'N/A',
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              _buildInfoField(
+                'Status',
+                userSwapRequest!['completed'] ? 'Completed' : 'Active',
+              ),
+              const SizedBox(height: 16),
+
+              _buildInfoField(
+                'Created At',
+                _formatDate(userSwapRequest!['created_at']),
+              ),
+              const SizedBox(height: 24),
+
+              Center(
+                child: SizedBox(
+                  width: 200,
+                  child: AppButton(
+                    label: 'Delete Request',
+                    onPressed: _deleteSwapRequest,
+                    backgroundColor: Colors.red,
+                    textColor: AppColors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -436,6 +538,7 @@ class _SwapScreenState extends State<SwapScreen> {
       } else {
         _showMessage('Swap request created successfully!');
         _clearForm();
+        await _loadUserSwapRequest(); // Load the newly created request
         _loadSwapData();
       }
     } catch (e) {
@@ -525,6 +628,55 @@ class _SwapScreenState extends State<SwapScreen> {
     setState(() {
       _requestType = 'public';
     });
+  }
+
+  Future<void> _deleteSwapRequest() async {
+    final confirmed = await _showConfirmationDialog(
+      'Delete Swap Request',
+      'Are you sure you want to delete your current swap request?',
+      'Delete',
+      'Cancel',
+    );
+
+    if (!confirmed) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.deleteSwapRequest();
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (response['error'] != null) {
+        _showMessage(response['error'], isError: true);
+      } else {
+        _showMessage('Swap request deleted successfully!');
+        setState(() {
+          userSwapRequest = null;
+        });
+        _loadSwapData(); // Refresh the data
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      _showMessage('Failed to delete swap request: $e', isError: true);
+    }
+  }
+
+  String _formatDate(String? dateString) {
+    if (dateString == null) return 'Unknown';
+
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return 'Invalid date';
+    }
   }
 
   void _showMessage(String message, {bool isError = false}) {
