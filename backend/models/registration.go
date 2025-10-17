@@ -11,4 +11,5 @@ type MessRegistrationDetails struct {
 	MessAUDHCapacity int       `json:"mess_a_udh_capacity"`
 	MessBLDHCapacity int       `json:"mess_b_ldh_capacity"`
 	MessBUDHCapacity int       `json:"mess_b_udh_capacity"`
+	VegMessCapacity  int       `json:"veg_mess_capacity",omitempty`
 }

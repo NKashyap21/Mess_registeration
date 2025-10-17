@@ -33,6 +33,8 @@ func GetMessName(messID int) string {
 		return "MessB LDH"
 	case MESS_B_UDH:
 		return "MessB UDH"
+	case VEG_MESS:
+		return "Veg Mess"
 	case NO_MESS:
 		return "No Mess"
 	default:
@@ -40,7 +42,7 @@ func GetMessName(messID int) string {
 	}
 }
 
-// IsValidMessID checks if the mess ID is valid (1-4)
+// IsValidMessID checks if the mess ID is valid (1-5)
 func IsValidMessID(messID int) bool {
 	return messID >= MESS_A_LDH && messID <= VEG_MESS
 }
@@ -77,7 +79,7 @@ func (r *RedisMessService) LoadCapacitiesFromDB() (map[int]int, error) {
 		MESS_A_UDH: regDetails.MessAUDHCapacity,
 		MESS_B_LDH: regDetails.MessBLDHCapacity,
 		MESS_B_UDH: regDetails.MessBUDHCapacity,
-		VEG_MESS:   regDetails.MessALDHCapacity + regDetails.MessAUDHCapacity,
+		VEG_MESS:   regDetails.MessALDHCapacity + regDetails.MessAUDHCapacity, // Veg mess shares capacity
 	}
 
 	return capacities, nil
@@ -110,7 +112,7 @@ func (r *RedisMessService) RefreshCapacitiesFromDB() error {
 func (r *RedisMessService) AttemptMessRegistration(userID uint, messID int) (bool, error) {
 	// Validate mess ID first
 	if !IsValidMessID(messID) {
-		return false, fmt.Errorf("invalid mess ID: %d. Valid range is 1-4", messID)
+		return false, fmt.Errorf("invalid mess ID: %d. Valid range is 1-5", messID)
 	}
 
 	counterKey := fmt.Sprintf(MESS_COUNTER_KEY, messID)

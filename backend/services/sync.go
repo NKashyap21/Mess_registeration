@@ -38,8 +38,6 @@ func (s *SyncService) isRegistrationOpen() bool {
 	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
 }
 
-
-
 // StartBackgroundSync starts the background sync process
 func (s *SyncService) StartBackgroundSync(intervalSeconds int) {
 	s.ticker = time.NewTicker(time.Duration(intervalSeconds) * time.Second)
@@ -203,6 +201,7 @@ func (s *SyncService) InitializeRedisFromDB() error {
 		2: regDetails.MessAUDHCapacity,
 		3: regDetails.MessBLDHCapacity,
 		4: regDetails.MessBUDHCapacity,
+		5: regDetails.MessALDHCapacity + regDetails.MessAUDHCapacity, // Veg mess shares capacity
 	}
 
 	if err := s.redisService.InitializeMessCapacities(capacities); err != nil {
@@ -210,7 +209,7 @@ func (s *SyncService) InitializeRedisFromDB() error {
 	}
 
 	// Count current registrations in database and sync to Redis
-	for messID := 1; messID <= 4; messID++ {
+	for messID := 1; messID <= 5; messID++ {
 		var count int64
 		if err := s.db.Model(&models.User{}).Where("mess = ?", messID).Count(&count).Error; err != nil {
 			return err
