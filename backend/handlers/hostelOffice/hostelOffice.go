@@ -324,28 +324,61 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 		upcomingStats[int(s.Mess)] = int(s.UpcomingCount)
 	}
 
-	utils.RespondWithJSON(c, http.StatusOK, gin.H{
-		"veg_registration_open":    details.VegRegistrationOpen,
-		"normal_registration_open": details.NormalRegistrationOpen,
-		"mess_a_ldh_capacity":      details.MessALDHCapacity,
-		"mess_a_udh_capacity":      details.MessAUDHCapacity,
-		"mess_b_ldh_capacity":      details.MessBLDHCapacity,
-		"mess_b_udh_capacity":      details.MessBUDHCapacity,
-		"veg_mess_capacity":        details.VegMessCapacity,
-		"current_mess": map[string]int{
-			"mess_a_ldh": currentStats[1],
-			"mess_a_udh": currentStats[2],
-			"mess_b_ldh": currentStats[3],
-			"mess_b_udh": currentStats[4],
+	// Compute unassigned_capacity, total_can_register, total_registered_yet
+	var totalCanRegister int64
+	var totalStudents int64
+	var totalCanButDidntRegister int64
+
+	oc.DB.Model(&models.User{}).Where("type = ?", 0).Count(&totalStudents) // total students
+	oc.DB.Model(&models.User{}).Where("can_register = ?", true).Count(&totalCanRegister)
+	oc.DB.Model(&models.User{}).Where("mess = 0 AND can_register = true").Count(&totalCanButDidntRegister)
+
+	response := gin.H{
+		"registration_status": gin.H{
+			"veg":    details.VegRegistrationOpen,
+			"normal": details.NormalRegistrationOpen,
+		},
+		"capacity": gin.H{
+			"mess_a": gin.H{
+				"ldh": details.MessALDHCapacity,
+				"udh": details.MessAUDHCapacity,
+			},
+			"mess_b": gin.H{
+				"ldh": details.MessBLDHCapacity,
+				"udh": details.MessBUDHCapacity,
+			},
+			"veg_mess": details.VegMessCapacity,
+		},
+		"totals": gin.H{
+			"students_total":         totalStudents,
+			"can_register":           totalCanRegister,
+			"can_but_didnt_register": totalCanButDidntRegister,
+		},
+		"current_mess": gin.H{
+			"mess_a": gin.H{
+				"ldh": currentStats[1],
+				"udh": currentStats[2],
+			},
+			"mess_b": gin.H{
+				"ldh": currentStats[3],
+				"udh": currentStats[4],
+			},
 			"veg_mess":   currentStats[5],
 			"unassigned": currentStats[0],
 		},
-		"upcoming_mess": map[string]int{
-			"mess_a_ldh": upcomingStats[1],
-			"mess_a_udh": upcomingStats[2],
-			"mess_b_ldh": upcomingStats[3],
-			"mess_b_udh": upcomingStats[4],
-			"veg_mess":   upcomingStats[5],
+		"upcoming_mess": gin.H{
+			"mess_a": gin.H{
+				"ldh": upcomingStats[1],
+				"udh": upcomingStats[2],
+			},
+			"mess_b": gin.H{
+				"ldh": upcomingStats[3],
+				"udh": upcomingStats[4],
+			},
+			"veg_mess": upcomingStats[5],
 		},
-	})
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, response)
+
 }

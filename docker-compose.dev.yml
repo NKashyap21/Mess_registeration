@@ -38,10 +38,10 @@ services:
       MESS_API_KEY: mess-scanner-api-key-12345
       GOOGLE_CLIENT_ID: 198469300367-cp8pf2d1qa5p7trsvcgktlj2fcjrq2h8.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
-      # FRONTEND_URL: http://localhost:3000
-      # BACKEND_URL: http://localhost:8080
-      FRONTEND_URL: https://mess.iith.dev
-      BACKEND_URL: https://mess.iith.dev
+      FRONTEND_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:8080
+      # FRONTEND_URL: https://mess.iith.dev
+      # BACKEND_URL: https://mess.iith.dev
     networks:
       - backend
       - frontend
