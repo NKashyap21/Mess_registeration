@@ -256,3 +256,55 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 		"veg_mess_capacity":        details.VegMessCapacity,
 	})
 }
+
+func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
+	// Step 1: Set both registrations to false
+	if err := oc.DB.Model(&models.MessRegistrationDetails{}).
+		Updates(map[string]interface{}{
+			"veg_registration_open":    false,
+			"normal_registration_open": false,
+		}).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to close registrations")
+		return
+	}
+
+	// Step 2: Begin a transaction for swapping mess info
+	tx := oc.DB.Begin()
+	if tx.Error != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to start transaction")
+		return
+	}
+
+	// Step 3: Copy next_mess → mess
+	if err := tx.Exec(`UPDATE users SET mess = next_mess`).Error; err != nil {
+		tx.Rollback()
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to copy next_mess to mess")
+		return
+	}
+
+	// Step 4: Reset next_mess to NULL or 0
+	if err := tx.Exec(`UPDATE users SET next_mess = 0`).Error; err != nil {
+		tx.Rollback()
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to reset next_mess")
+		return
+	}
+
+	// Step 5: Commit transaction
+	if err := tx.Commit().Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to commit transaction")
+		return
+	}
+
+	// Step 6: Return new status
+	var details models.MessRegistrationDetails
+	if err := oc.DB.First(&details).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch updated registration status")
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message":                  "New registration cycle applied successfully",
+		"veg_registration_open":    details.VegRegistrationOpen,
+		"normal_registration_open": details.NormalRegistrationOpen,
+	})
+}

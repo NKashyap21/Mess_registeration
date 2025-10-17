@@ -13,6 +13,17 @@ import (
 func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 
+	var regDetails models.MessRegistrationDetails
+	if err := sc.DB.First(&regDetails).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch registration details")
+		return
+	}
+
+	if regDetails.NormalRegistrationOpen || regDetails.VegRegistrationOpen {
+		utils.RespondWithError(c, http.StatusBadRequest, "Swap requests can only be made after registrations are closed")
+		return
+	}
+
 	var swapRequest models.SwapRequest
 	utils.ParseJSONRequest(c, &swapRequest)
 
