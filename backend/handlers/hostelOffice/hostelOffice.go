@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/LambdaIITH/mess_registration/models"
-	"github.com/LambdaIITH/mess_registration/state"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (oc *OfficeController) GetStudents(c *gin.Context) {
@@ -89,47 +89,63 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 }
 
 func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
-	if !state.GetRegistrationStatusReg() {
-		state.ChangeRegistrationStatusReg(true)
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Started.")
-		return
-	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration has already started.")
-		return
-	}
-}
+	var registrationDetails models.MessRegistrationDetails
 
-func (oc *OfficeController) EndRegRegistration(c *gin.Context) {
-	if state.GetRegistrationStatusReg() {
-		state.ChangeRegistrationStatusReg(false)
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Ended.")
-		return
-	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Ended Already.")
+	if err := utils.ParseJSONRequest(c, &registrationDetails); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid payload")
 		return
 	}
 
+	// Check if payload tries to change veg registration dates
+	if !registrationDetails.VegRegistrationStart.IsZero() || !registrationDetails.VegRegistrationEnd.IsZero() {
+		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change veg registration dates in normal registration endpoint")
+		return
+	}
+
+	// Update the dates in DB
+	if err := oc.DB.First(&registrationDetails, "WHERE 1=1").Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create new record
+			if err := oc.DB.Create(&registrationDetails).Error; err != nil {
+				log.Println(err)
+				utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+				return
+			}
+		} else {
+			log.Println(err)
+			utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+			return
+		}
+	}
 }
 
 func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
-	if !state.GetRegistrationStatusVeg() {
-		state.ChangeRegistrationStatusVeg(true)
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Started.")
-		return
-	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration has already started.")
-		return
-	}
-}
+	var registrationDetails models.MessRegistrationDetails
 
-func (oc *OfficeController) EndVegRegistration(c *gin.Context) {
-	if state.GetRegistrationStatusVeg() {
-		state.ChangeRegistrationStatusVeg(false)
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Ended.")
-		return
-	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Ended Already.")
+	if err := utils.ParseJSONRequest(c, &registrationDetails); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid payload")
 		return
 	}
 
+	// Check if payload tries to change normal registration dates
+	if !registrationDetails.NormalRegistrationStart.IsZero() || !registrationDetails.NormalRegistrationEnd.IsZero() {
+		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change normal registration dates in veg registration endpoint")
+		return
+	}
+
+	// Update the dates in DB
+	if err := oc.DB.First(&registrationDetails, "WHERE 1=1").Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create new record
+			if err := oc.DB.Create(&registrationDetails).Error; err != nil {
+				log.Println(err)
+				utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+				return
+			}
+		} else {
+			log.Println(err)
+			utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+			return
+		}
+	}
 }
