@@ -238,12 +238,20 @@ func (r *RedisMessService) RemoveFromPendingSync(userID uint) error {
 		return result.Err()
 	}
 
+	// Manually remove key
+	userMessKey := fmt.Sprintf(USER_MESS_KEY, userID)
+	res := r.client.Del(r.ctx, userMessKey)
+	if res.Err() != nil {
+		return res.Err()
+	}
+
 	// Log if the user was actually removed (result should be 1 if removed, 0 if not found)
 	if result.Val() == 0 {
 		return fmt.Errorf("user %d not found in pending sync queue", userID)
 	}
 
 	return nil
+
 }
 
 // ClearUserRegistration removes a user's mess assignment (for rollback scenarios)
