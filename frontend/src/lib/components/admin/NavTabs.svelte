@@ -10,8 +10,8 @@
 
 <button
 	class="rounded-t-2xl {className} px-8 py-4 text-center leading-0 font-bold text-nowrap select-none hover:cursor-pointer hover:brightness-95 {active
-		? 'bg-white'
-		: 'bg-custom-light-grey'}"
+		? 'bg-white dark:bg-custom-dark-grey'
+		: 'bg-custom-light-grey dark:bg-custom-light-grey'}"
 	{...rest}
 >
 	{text}
