@@ -58,7 +58,8 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 		// Found an opposite request, auto accept both
 		swapRequest.Completed = true
 		oppositeRequest.Completed = true
-		err = sc.DB.Save(&oppositeRequest).Where("user_id = ?", oppositeRequest.UserID).Error
+
+		err = sc.DB.Model(&db.SwapRequest{}).Where("user_id = ?", oppositeRequest.UserID).Update("completed", oppositeRequest.Completed).Error
 		if err != nil {
 			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update opposite swap request")
 			return
