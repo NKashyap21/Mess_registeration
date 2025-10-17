@@ -40,6 +40,9 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 		swapRequest.Direction = "A to B"
 	case 3, 4:
 		swapRequest.Direction = "B to A"
+	case 5:
+		utils.RespondWithError(c, http.StatusBadRequest, "User is in veg mess, cannot create swap request")
+		return
 	default:
 		utils.RespondWithError(c, http.StatusBadRequest, "User is not assigned to any mess")
 		return
