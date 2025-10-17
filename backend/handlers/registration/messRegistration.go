@@ -16,7 +16,7 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 	logger := services.GetLoggerService()
 
 	if !state.GetRegistrationStatusReg() {
-		utils.RespondWithError(c, http.StatusForbidden, "Registeration Has Ended.")
+		utils.RespondWithError(c, http.StatusForbidden, "Registration Has Ended.")
 		return
 	}
 
@@ -98,7 +98,7 @@ func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 	// Check if the current date is within the registration period
 
 	if !state.GetRegistrationStatusVeg() {
-		utils.RespondWithJSON(c, http.StatusForbidden, "Registeration Has Ended.")
+		utils.RespondWithJSON(c, http.StatusForbidden, "Registration Has Ended.")
 		return
 	}
 	userID := utils.ValidateSession(c)
@@ -247,4 +247,3 @@ func (m *MessController) IsRegistrationOpen(c *gin.Context) {
 		"veg":     state.GetRegistrationStatusVeg(),
 	})
 }
-

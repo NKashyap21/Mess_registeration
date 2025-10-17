@@ -1,12 +1,12 @@
 package state
 
 var (
-	RegRegisterationOpen = true
-	VegRegistrationOpen  = true
+	RegRegistrationOpen = true
+	VegRegistrationOpen = true
 )
 
 func GetRegistrationStatusReg() bool {
-	return RegRegisterationOpen
+	return RegRegistrationOpen
 }
 
 func GetRegistrationStatusVeg() bool {
@@ -14,7 +14,7 @@ func GetRegistrationStatusVeg() bool {
 }
 
 func ChangeRegistrationStatusReg(value bool) {
-	RegRegisterationOpen = value
+	RegRegistrationOpen = value
 }
 
 func ChangeRegistrationStatusVeg(value bool) {
