@@ -52,20 +52,20 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 	// Check if there is a public request already floating with the opposite direction
 	// If yes, auto accept both requests and update mess of both users
 	var oppositeRequest db.SwapRequest
-	err = sc.DB.First(&oppositeRequest, "direction = ? AND completed = ?",
-		map[string]string{"A to B": "B to A", "B to A": "A to B"}[swapRequest.Direction], false).Error
+	err = sc.DB.First(&oppositeRequest, "direction = ? AND completed = ? AND type = ?",
+		map[string]string{"A to B": "B to A", "B to A": "A to B"}[swapRequest.Direction], false, "public").Error
 	if err == nil {
 		// Found an opposite request, auto accept both
 		swapRequest.Completed = true
 		oppositeRequest.Completed = true
-		err = sc.DB.Update("completed", oppositeRequest).Error
+		err = sc.DB.Update("completed", oppositeRequest.Completed).Where("user_id = ?", oppositeRequest.UserID).Error
 		if err != nil {
 			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update opposite swap request")
 			return
 		}
 
 		// Update mess of both users
-		var oppositeUser models.User
+		var oppositeUser db.User
 		err = sc.DB.First(&oppositeUser, "id = ?", oppositeRequest.UserID).Error
 		if err != nil {
 			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch opposite user info")
