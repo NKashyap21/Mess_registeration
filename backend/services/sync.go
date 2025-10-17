@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LambdaIITH/mess_registration/config"
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"gorm.io/gorm"
 )
@@ -143,7 +144,7 @@ func (s *SyncService) syncUserRegistration(userID uint) error {
 	}()
 
 	// Get user from database
-	var user models.User
+	var user db.User
 	if err := tx.First(&user, userID).Error; err != nil {
 		tx.Rollback()
 		if err == gorm.ErrRecordNotFound {
@@ -179,6 +180,8 @@ func (s *SyncService) syncUserRegistration(userID uint) error {
 	// Remove from pending sync queue
 	if err := s.redisService.RemoveFromPendingSync(userID); err != nil {
 		log.Printf("Warning: Failed to remove user %d from pending sync queue: %v", userID, err)
+	} else if err == nil {
+		log.Printf("User %d removed from pending sync queue", userID)
 	}
 
 	log.Printf("Successfully synced user %d with mess %d to database", userID, messID)
