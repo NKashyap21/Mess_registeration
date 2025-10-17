@@ -317,7 +317,7 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 	}
 
 	currentStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-	upcomingStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	upcomingStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
 	for _, s := range stats {
 		currentStats[int(s.Mess)] = int(s.CurrentCount)
@@ -328,10 +328,12 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 	var totalCanRegister int64
 	var totalStudents int64
 	var totalCanButDidntRegister int64
+	var totalCanButDidntRegisterUpcoming int64
 
 	oc.DB.Model(&models.User{}).Where("type = ?", 0).Count(&totalStudents) // total students
 	oc.DB.Model(&models.User{}).Where("can_register = ?", true).Count(&totalCanRegister)
 	oc.DB.Model(&models.User{}).Where("mess = 0 AND can_register = true").Count(&totalCanButDidntRegister)
+	oc.DB.Model(&models.User{}).Where("next_mess = 0 AND can_register = true").Count(&totalCanButDidntRegisterUpcoming)
 
 	response := gin.H{
 		"registration_status": gin.H{
@@ -350,32 +352,38 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 			"veg_mess": details.VegMessCapacity,
 		},
 		"totals": gin.H{
-			"students_total":         totalStudents,
-			"can_register":           totalCanRegister,
-			"can_but_didnt_register": totalCanButDidntRegister,
+			"students_total":                  totalStudents,
+			"can_register":                    totalCanRegister,
+			"can_but_didnt_register":          totalCanButDidntRegister,
+			"can_but_didnt_register_upcoming": totalCanButDidntRegisterUpcoming,
 		},
 		"current_mess": gin.H{
-			"mess_a": gin.H{
-				"ldh": currentStats[1],
-				"udh": currentStats[2],
+			"Mess A": gin.H{
+				"LDH": currentStats[1],
+				"UDH": currentStats[2],
 			},
-			"mess_b": gin.H{
-				"ldh": currentStats[3],
-				"udh": currentStats[4],
+			"Mess B": gin.H{
+				"LDH": currentStats[3],
+				"UDH": currentStats[4],
 			},
-			"veg_mess":   currentStats[5],
-			"unassigned": currentStats[0],
+			"Extra": gin.H{
+				"Veg Mess":   currentStats[5],
+				"Unassigned": currentStats[0],
+			},
 		},
 		"upcoming_mess": gin.H{
-			"mess_a": gin.H{
-				"ldh": upcomingStats[1],
-				"udh": upcomingStats[2],
+			"Mess A": gin.H{
+				"LDH": upcomingStats[1],
+				"UDH": upcomingStats[2],
 			},
-			"mess_b": gin.H{
-				"ldh": upcomingStats[3],
-				"udh": upcomingStats[4],
+			"Mess B": gin.H{
+				"LDH": upcomingStats[3],
+				"UDH": upcomingStats[4],
 			},
-			"veg_mess": upcomingStats[5],
+			"Extra": gin.H{
+				"Veg Mess":   upcomingStats[5],
+				"Unassigned": upcomingStats[0],
+			},
 		},
 	}
 
