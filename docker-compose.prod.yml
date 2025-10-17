@@ -52,21 +52,21 @@ services:
       - backend
       - frontend
 
-  # frontend:
-  #   image: muqeeth26832/mess-registration-frontend:latest
-  #   # build:
-  #   #   context: ./frontend
-  #   #   dockerfile: ./Dockerfile
-  #   container_name: mess_registration_frontend
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     GOOGLE_CLIENT_ID: 1060092687139-6dq56kb1e5m7bopl7i7gr3grs0ih0hho.apps.googleusercontent.com
-  #     GOOGLE_CLIENT_SECRET: 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
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - frontend
+  frontend:
+    image: muqeeth26832/mess-registration-frontend:latest
+    # build:
+    #   context: ./frontend
+    #   dockerfile: ./Dockerfile
+    container_name: mess_registration_frontend
+    depends_on:
+      - backend
+    environment:
+      GOOGLE_CLIENT_ID: 1060092687139-6dq56kb1e5m7bopl7i7gr3grs0ih0hho.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
 
   redis:
     image: redis:7-alpine
