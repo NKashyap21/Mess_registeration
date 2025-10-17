@@ -49,7 +49,7 @@ func SetupRouter() *gin.Engine {
 	students := api.Group("/students")
 	students.Use(middleware.TokenRequired(config.GetDB(), &gin.Context{}))
 	// students.GET("/getUser", userController.GetUserInfoHandler)
-	students.GET("/", registrationController.IsRegistrationOpen)
+	students.GET("/isRegistrationOpen", registrationController.IsRegistrationOpen)
 	students.POST("/registerMess/:mess", registrationController.MessRegistrationHandler)
 	students.POST("/registerVegMess", registrationController.VegMessRegistrationHandler)
 	students.GET("/getMess", registrationController.GetUserMessHandler)
