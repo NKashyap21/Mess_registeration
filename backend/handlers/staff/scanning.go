@@ -131,10 +131,10 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	}
 
 	// Determine the TTL based on the current time
-	istLocation, _ := time.LoadLocation("Asia/Kolkata")
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
 	currentTime := time.Now().In(istLocation)
-	var ttl time.Duration
 
+	var ttl time.Duration
 	if currentTime.Hour() == 17 { // 5-6 PM IST (snacks time)
 		ttl = 1 * time.Hour
 	} else {
