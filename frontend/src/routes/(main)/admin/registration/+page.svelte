@@ -30,7 +30,8 @@
 												innerClass={idx % 2 == 0
 													? 'bg-[#919191] dark:bg-[#B4B4B4]'
 													: 'bg-custom-light-orange'}
-												value={1}
+												value={(data.status['current_mess'][messName][hall] * 100) /
+													data.status['capacity'][messName][hall]}
 											/>
 											<h3 class="px-6 text-xl font-medium">
 												{data.status['current_mess'][messName][hall]}/{data.status['capacity'][
@@ -62,7 +63,8 @@
 												innerClass={idx % 2 == 0
 													? 'bg-[#919191] dark:bg-[#B4B4B4]'
 													: 'bg-custom-light-orange'}
-												value={1}
+												value={(data.status['current_mess'][messName][hall] * 100) /
+													data.status['capacity'][messName][hall]}
 											/>
 											<h3 class="px-6 text-xl font-medium">
 												{data.status['upcoming_mess'][messName][hall]}/{data.status['capacity'][

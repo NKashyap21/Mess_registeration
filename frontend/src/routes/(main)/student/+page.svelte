@@ -32,6 +32,8 @@
 		{#if !registered}
 			{#if data.regData.regular}
 				<Button
+					disabled={data.userMessData.status == 'pending_sync' ||
+						(data.userMessData.status == 'confirmed' && !registered)}
 					onclick={() => {
 						goto('student/register?veg=false');
 					}}
@@ -40,6 +42,8 @@
 			{/if}
 			{#if data.regData.veg}
 				<Button
+					disabled={data.userMessData.status == 'pending_sync' ||
+						(data.userMessData.status == 'confirmed' && !registered)}
 					onclick={() => {
 						goto('student/register?veg=true');
 					}}
