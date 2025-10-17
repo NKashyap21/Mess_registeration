@@ -58,7 +58,7 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 		// Found an opposite request, auto accept both
 		swapRequest.Completed = true
 		oppositeRequest.Completed = true
-		err = sc.DB.Save(&oppositeRequest).Error
+		err = sc.DB.Update("completed", oppositeRequest).Error
 		if err != nil {
 			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update opposite swap request")
 			return
