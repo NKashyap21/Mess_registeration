@@ -151,30 +151,17 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 // }
 
 func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
-	var reg models.MessRegistrationDetails
+	result := oc.DB.Model(&models.MessRegistrationDetails{}).Limit(1).
+		Update("normal_registration_open", gorm.Expr("NOT normal_registration_open"))
 
-	// There should only be one row
-	if err := oc.DB.First(&reg).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// Create new record with NormalRegistrationOpen = true by default
-			reg = models.MessRegistrationDetails{NormalRegistrationOpen: true}
-			if err := oc.DB.Create(&reg).Error; err != nil {
-				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create registration details")
-				return
-			}
-		} else {
-			log.Println("Error fetching registration details:", err)
-			utils.RespondWithError(c, http.StatusInternalServerError, "Database error")
-			return
-		}
-	} else {
-		// Flip the normal registration state
-		reg.NormalRegistrationOpen = !reg.NormalRegistrationOpen
-		if err := oc.DB.Save(&reg).Error; err != nil {
-			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle normal registration")
-			return
-		}
+	if result.Error != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle normal registration")
+		return
 	}
+
+	// Fetch the updated row to return current status
+	var reg models.MessRegistrationDetails
+	oc.DB.First(&reg)
 
 	status := "closed"
 	if reg.NormalRegistrationOpen {
@@ -195,29 +182,16 @@ func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
 }
 
 func (oc *OfficeController) ToggleVegRegistration(c *gin.Context) {
-	var reg models.MessRegistrationDetails
+	result := oc.DB.Model(&models.MessRegistrationDetails{}).Limit(1).
+		Update("veg_registration_open", gorm.Expr("NOT veg_registration_open"))
 
-	if err := oc.DB.First(&reg).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// Create new record with VegRegistrationOpen = true by default
-			reg = models.MessRegistrationDetails{VegRegistrationOpen: true}
-			if err := oc.DB.Create(&reg).Error; err != nil {
-				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create registration details")
-				return
-			}
-		} else {
-			log.Println("Error fetching registration details:", err)
-			utils.RespondWithError(c, http.StatusInternalServerError, "Database error")
-			return
-		}
-	} else {
-		// Flip the veg registration state
-		reg.VegRegistrationOpen = !reg.VegRegistrationOpen
-		if err := oc.DB.Save(&reg).Error; err != nil {
-			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle veg registration")
-			return
-		}
+	if result.Error != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle veg registration")
+		return
 	}
+
+	var reg models.MessRegistrationDetails
+	oc.DB.First(&reg)
 
 	status := "closed"
 	if reg.VegRegistrationOpen {
