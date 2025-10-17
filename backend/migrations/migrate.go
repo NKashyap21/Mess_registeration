@@ -15,6 +15,7 @@ func MigrateDB() error {
 		&models.User{},
 		&models.LoggerDetails{}, // Add logs table
 		&models.MessRegistrationDetails{},
+		&models.SwapRequest{},
 	)
 
 	if err != nil {
