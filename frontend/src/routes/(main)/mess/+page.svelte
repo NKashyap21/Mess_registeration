@@ -45,23 +45,26 @@
 						);
 
 						const jsondata = await res.json();
+						console.log(jsondata);
 						if (res.status == 200) {
 							success = true;
 						} else {
 							success = false;
 						}
 						if (Object.keys(jsondata).includes('data')) {
-							rollNo = jsondata['data']['user']['roll_no'];
-							studentName = jsondata['data']['user']['name'];
-							const messId = jsondata['data']['user']['mess'];
-							if (messId == 1) {
-								registeredMess = 'Mess A - LDH';
-							} else if (messId == 2) {
-								registeredMess = 'Mess A - UDH';
-							} else if (messId == 3) {
-								registeredMess = 'Mess B - LDH';
-							} else if (messId == 4) {
-								registeredMess = 'Mess B - UDH';
+							if (jsondata['data'] != null) {
+								rollNo = jsondata['data']['user']['roll_no'];
+								studentName = jsondata['data']['user']['name'];
+								const messId = jsondata['data']['user']['mess'];
+								if (messId == 1) {
+									registeredMess = 'Mess A - LDH';
+								} else if (messId == 2) {
+									registeredMess = 'Mess A - UDH';
+								} else if (messId == 3) {
+									registeredMess = 'Mess B - LDH';
+								} else if (messId == 4) {
+									registeredMess = 'Mess B - UDH';
+								}
 							}
 						}
 						extraText = jsondata.message;
