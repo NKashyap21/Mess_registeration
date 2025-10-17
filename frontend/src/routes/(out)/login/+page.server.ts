@@ -5,7 +5,8 @@ import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
 export const actions = {
 	OAuth2: async ({}) => {
 		// const redirectURL = 'http://localhost:5173/oauth';
-		const redirectURL = 'http://localhost:3000/oauth';
+		// const redirectURL = 'http://localhost:3000/oauth';
+		const redirectURL = 'http://mess.iith.dev/oauth';
 
 		const oAuth2Client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectURL);
 

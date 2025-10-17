@@ -1,8 +1,8 @@
 package state
 
 var (
-	RegRegisterationOpen = false
-	VegRegistrationOpen  = false
+	RegRegisterationOpen = true
+	VegRegistrationOpen  = true
 )
 
 func GetRegistrationStatusReg() bool {

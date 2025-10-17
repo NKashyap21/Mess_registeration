@@ -13,15 +13,10 @@ services:
       - backend
 
   backend:
-    # image: muqeeth26832/mess-registration-backend:latest
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile
+    image: muqeeth26832/mess-registration-backend:latest
     container_name: mess_registration_backend
     depends_on:
       - db
-    ports:
-      - "8080:8080"
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -29,47 +24,36 @@ services:
       DB_USER: postgres
       DB_PASSWORD: password
       DB_SSLMODE: disable
-      REDIS_HOST: redis # instead of localhost
+      REDIS_HOST: redis
       REDIS_PORT: 6379
-
-      # JWT Configuration
       JWT_SECRET: your-super-secret-jwt-key-change-in-production-make-it-long-and-random
       SYNC_INTERVAL_SECONDS: 30
       REDIS_DB: 0
-
-      # Server Configuration
       PORT: 8080
-      GIN_MODE: debug
-      # API Keys
       MESS_API_KEY: mess-scanner-api-key-12345
-      # OAuth Configuration
       GOOGLE_CLIENT_ID: 198469300367-cp8pf2d1qa5p7trsvcgktlj2fcjrq2h8.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
+      FRONTEND_URL: https://mess.iith.dev
+      BACKEND_URL: https://mess.iith.dev
     networks:
       - backend
       - frontend
 
   frontend:
-    # image: muqeeth26832/mess-registration-frontend:latest
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
+    image: muqeeth26832/mess-registration-frontend:latest
     container_name: mess_registration_frontend
     depends_on:
       - backend
     environment:
+      PUBLIC_API_URL: https://mess.iith.dev/api
       GOOGLE_CLIENT_ID: 198469300367-cp8pf2d1qa5p7trsvcgktlj2fcjrq2h8.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
-    ports:
-      - "3000:3000"
     networks:
       - frontend
 
   redis:
     image: redis:7-alpine
     container_name: mess_registration_redis
-    # ports:
-    #   - "6379:6379"
     networks:
       - backend
   nginx:

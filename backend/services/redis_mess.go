@@ -77,6 +77,7 @@ func (r *RedisMessService) LoadCapacitiesFromDB() (map[int]int, error) {
 		MESS_A_UDH: regDetails.MessAUDHCapacity,
 		MESS_B_LDH: regDetails.MessBLDHCapacity,
 		MESS_B_UDH: regDetails.MessBUDHCapacity,
+		VEG_MESS:   regDetails.MessALDHCapacity + regDetails.MessAUDHCapacity,
 	}
 
 	return capacities, nil

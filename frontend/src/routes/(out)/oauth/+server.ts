@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			localStorage.setItem('jwt', data.data.token);
 
 			// Redirect to student page
-			// goto('/student');
+			goto('/student');
 		};
 
 		await loginToBackend(user.id_token); // Call backend login
