@@ -103,7 +103,7 @@ func (a *AuthController) handleMobileLogin(c *gin.Context) {
 
 func (a *AuthController) Logout(c *gin.Context) {
 	// Clear the JWT cookie for web clients
-	c.SetCookie("jwt", "", -1, "/", os.Getenv("FRONTEND_URL"), false, true)
+	c.SetCookie("jwt", "", -1, "/", strings.Split(os.Getenv("FRONTEND_URL"), ":")[1][2:], false, true)
 
 	// Return JSON response for mobile clients
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
@@ -176,7 +176,7 @@ func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 	// Log successful login
 	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("User %s logged in successfully", email), c.ClientIP())
 
-	c.SetCookie("jwt", tokenString, int(jwtData["exp"].(float64)-jwtData["iat"].(float64)), "/", os.Getenv("FRONTEND_URL"), false, true)
+	c.SetCookie("jwt", tokenString, int(jwtData["exp"].(float64)-jwtData["iat"].(float64)), "/", strings.Split(os.Getenv("FRONTEND_URL"), ":")[1][2:], false, true)
 	c.Redirect(http.StatusTemporaryRedirect, os.Getenv("FRONTEND_URL"))
 
 	// utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{

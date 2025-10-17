@@ -1,6 +1,6 @@
-import { PUBLIC_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
+import { PRIVATE_API_URL } from '$env/static/private';
 
 export const load: LayoutServerLoad = async ({ parent, fetch }) => {
 	const par = await parent();
@@ -11,15 +11,23 @@ export const load: LayoutServerLoad = async ({ parent, fetch }) => {
 			throw redirect(307, '/admin');
 		}
 	}
-	return {
-		regData: await (
-			await fetch(PUBLIC_API_URL + '/students/isRegistrationOpen', {
-				method: 'GET',
-				credentials: 'include'
-			})
-		).json(),
-		userMessData: await (
-			await fetch(PUBLIC_API_URL + '/students/getMess', { method: 'GET', credentials: 'include' })
-		).json()
-	};
+	try {
+		return {
+			regData: await (
+				await fetch(PRIVATE_API_URL + '/students/isRegistrationOpen', {
+					method: 'GET',
+					credentials: 'include'
+				})
+			).json(),
+			userMessData: await (
+				await fetch(PRIVATE_API_URL + '/students/getMess', {
+					method: 'GET',
+					credentials: 'include'
+				})
+			).json()
+		};
+	} catch (e) {
+		console.error('Failed to fetch data under students route');
+		console.error(e);
+	}
 };

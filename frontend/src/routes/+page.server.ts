@@ -1,6 +1,6 @@
-import { PUBLIC_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { PRIVATE_API_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ fetch, parent }) => {
 	const par = await parent();
@@ -11,7 +11,8 @@ export const load: PageServerLoad = async ({ fetch, parent }) => {
 	} else if (par.user['user_type'] == 2) {
 		throw redirect(307, '/admin');
 	} else {
-		await fetch(PUBLIC_API_URL + '/logout', { method: 'POST', credentials: 'include' });
+		await fetch(PRIVATE_API_URL + '/logout', { method: 'POST', credentials: 'include' });
+		console.error('Failed page server load at /');
 		throw redirect(307, '/login');
 	}
 };

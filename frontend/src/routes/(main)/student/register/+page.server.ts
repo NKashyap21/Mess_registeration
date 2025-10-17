@@ -1,6 +1,6 @@
-import { PUBLIC_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { PRIVATE_API_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const data = await parent();
@@ -17,7 +17,7 @@ export const actions = {
 	default: async ({ request, fetch }) => {
 		const data = await request.formData();
 		if (data.get('veg') == 'true') {
-			const res = await fetch(PUBLIC_API_URL + '/students/registerVegMess', {
+			const res = await fetch(PRIVATE_API_URL + '/students/registerVegMess', {
 				method: 'POST',
 				credentials: 'include'
 			});
@@ -33,7 +33,7 @@ export const actions = {
 			};
 		} else {
 			const res = await fetch(
-				PUBLIC_API_URL + '/students/registerMess/' + parseInt(data.get('mess')?.toString()!),
+				PRIVATE_API_URL + '/students/registerMess/' + parseInt(data.get('mess')?.toString()!),
 				{
 					method: 'POST',
 					credentials: 'include'

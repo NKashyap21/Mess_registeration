@@ -1,11 +1,11 @@
-import { PUBLIC_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
+import { PRIVATE_API_URL } from '$env/static/private';
 
 export const load: LayoutServerLoad = async ({ fetch }) => {
-	const res = await fetch(PUBLIC_API_URL + '/getUser', { method: 'GET', credentials: 'include' });
+	const res = await fetch(PRIVATE_API_URL + '/getUser', { method: 'GET', credentials: 'include' });
 	if (res.status != 200) {
-		fetch(PUBLIC_API_URL + '/logout', { method: 'POST', credentials: 'include' });
+		fetch(PRIVATE_API_URL + '/logout', { method: 'POST', credentials: 'include' });
 		redirect(307, '/login');
 	}
 	let userData = await res.json();

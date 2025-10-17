@@ -1,6 +1,8 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 import type { PageLoad } from './$types';
 
+export const ssr = false;
+
 export const load: PageLoad = async ({ fetch }) => {
 	return {
 		messStats: await (
