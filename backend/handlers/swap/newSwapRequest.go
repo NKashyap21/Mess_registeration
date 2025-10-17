@@ -3,6 +3,7 @@ package swap
 import (
 	"net/http"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -87,7 +88,15 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 		}
 	}
 
-	err = sc.DB.Create(&swapRequest).Error
+	var dbSwapRequest db.SwapRequest
+
+	dbSwapRequest.Type = swapRequest.Type
+	dbSwapRequest.UserID = userID
+	dbSwapRequest.Direction = swapRequest.Direction
+	dbSwapRequest.Completed = swapRequest.Completed
+	dbSwapRequest.Password = swapRequest.Password
+
+	err = sc.DB.Create(&dbSwapRequest).Error
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create swap request")
 		return
