@@ -6,7 +6,7 @@ export const ssr = false;
 export const load: PageServerLoad = async ({ fetch }) => {
 	return {
 		registrationState: await (
-			await fetch(PRIVATE_API_URL + '/students/', {
+			await fetch(PRIVATE_API_URL + '/students/isRegistrationOpen', {
 				method: 'get',
 				credentials: 'include'
 			})

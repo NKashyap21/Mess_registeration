@@ -1,17 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { PRIVATE_API_URL } from '$env/static/private';
 
-export const load: LayoutServerLoad = async ({ fetch }) => {
-	const res = await fetch(PRIVATE_API_URL + '/getUser', { method: 'GET', credentials: 'include' });
-	if (res.status != 200) {
-		fetch(PRIVATE_API_URL + '/logout', { method: 'POST', credentials: 'include' });
-		redirect(307, '/login');
-	}
-	let userData = await res.json();
-	userData = userData['data'];
-	if (userData['user_type'] != 2) {
-		if (userData['user_type'] == 1) {
+export const load: LayoutServerLoad = async ({ parent }) => {
+	const par = await parent();
+	if (par.user['user_type'] != 2) {
+		if (par.user['user_type'] == 1) {
 			throw redirect(307, '/mess');
 		} else {
 			throw redirect(307, '/student');
