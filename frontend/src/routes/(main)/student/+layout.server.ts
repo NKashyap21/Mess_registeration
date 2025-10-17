@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ parent, fetch }) => {
 	}
 	return {
 		regData: await (
-			await fetch(PUBLIC_API_URL + '/students', {
+			await fetch(PUBLIC_API_URL + '/students/isRegistrationOpen', {
 				method: 'GET',
 				credentials: 'include'
 			})
