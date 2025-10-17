@@ -189,7 +189,7 @@ func (r *RedisMessService) GetUserMess(userID uint) (int, error) {
 	result, err := r.client.Get(r.ctx, userMessKey).Result()
 
 	if err == redis.Nil {
-		return -1, fmt.Errorf("key not in redis") // User has no mess assigned
+		return 0, nil // User has no mess assigned
 	}
 	if err != nil {
 		return 0, err
