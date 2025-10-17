@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -151,63 +152,32 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 // }
 
 func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
-	result := oc.DB.Model(&models.MessRegistrationDetails{}).Limit(1).
-		Update("normal_registration_open", gorm.Expr("NOT normal_registration_open"))
-
-	if result.Error != nil {
+	// Toggle NormalRegistrationOpen for the first row
+	if err := oc.DB.Model(&db.MessRegistrationDetails{}).
+		Limit(1).
+		Update("normal_registration_open", gorm.Expr("NOT normal_registration_open")).
+		Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle normal registration")
 		return
 	}
 
-	// Fetch the updated row to return current status
-	var reg models.MessRegistrationDetails
-	oc.DB.First(&reg)
-
-	status := "closed"
-	if reg.NormalRegistrationOpen {
-		status = "open"
-	}
-
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{
-		"message":                  "Normal registration toggled successfully",
-		"status":                   status,
-		"normal_registration_open": reg.NormalRegistrationOpen,
-		"veg_registration_open":    reg.VegRegistrationOpen,
-		"mess_a_ldh_capacity":      reg.MessALDHCapacity,
-		"mess_a_udh_capacity":      reg.MessAUDHCapacity,
-		"mess_b_ldh_capacity":      reg.MessBLDHCapacity,
-		"mess_b_udh_capacity":      reg.MessBUDHCapacity,
-		"veg_mess_capacity":        reg.VegMessCapacity,
+		"message": "Normal registration toggled successfully",
 	})
 }
 
 func (oc *OfficeController) ToggleVegRegistration(c *gin.Context) {
-	result := oc.DB.Model(&models.MessRegistrationDetails{}).Limit(1).
-		Update("veg_registration_open", gorm.Expr("NOT veg_registration_open"))
-
-	if result.Error != nil {
+	// Toggle VegRegistrationOpen for the first row
+	if err := oc.DB.Model(&db.MessRegistrationDetails{}).
+		Limit(1).
+		Update("veg_registration_open", gorm.Expr("NOT veg_registration_open")).
+		Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle veg registration")
 		return
 	}
 
-	var reg models.MessRegistrationDetails
-	oc.DB.First(&reg)
-
-	status := "closed"
-	if reg.VegRegistrationOpen {
-		status = "open"
-	}
-
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{
-		"message":                  "Veg registration toggled successfully",
-		"status":                   status,
-		"normal_registration_open": reg.NormalRegistrationOpen,
-		"veg_registration_open":    reg.VegRegistrationOpen,
-		"mess_a_ldh_capacity":      reg.MessALDHCapacity,
-		"mess_a_udh_capacity":      reg.MessAUDHCapacity,
-		"mess_b_ldh_capacity":      reg.MessBLDHCapacity,
-		"mess_b_udh_capacity":      reg.MessBUDHCapacity,
-		"veg_mess_capacity":        reg.VegMessCapacity,
+		"message": "Veg registration toggled successfully",
 	})
 }
 
