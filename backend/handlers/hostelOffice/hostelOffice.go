@@ -237,26 +237,6 @@ func (oc *OfficeController) ToggleVegRegistration(c *gin.Context) {
 	})
 }
 
-func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
-	var details models.MessRegistrationDetails
-
-	// Fetch the single record (you can use LIMIT 1 or WHERE 1=1)
-	if err := oc.DB.First(&details).Error; err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, "Could not fetch registration status")
-		return
-	}
-
-	utils.RespondWithJSON(c, http.StatusOK, gin.H{
-		"veg_registration_open":    details.VegRegistrationOpen,
-		"normal_registration_open": details.NormalRegistrationOpen,
-		"mess_a_ldh_capacity":      details.MessALDHCapacity,
-		"mess_a_udh_capacity":      details.MessAUDHCapacity,
-		"mess_b_ldh_capacity":      details.MessBLDHCapacity,
-		"mess_b_udh_capacity":      details.MessBUDHCapacity,
-		"veg_mess_capacity":        details.VegMessCapacity,
-	})
-}
-
 func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	// Step 1: Set both registrations to false
 	if err := oc.DB.Model(&models.MessRegistrationDetails{}).
@@ -306,5 +286,66 @@ func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 		"message":                  "New registration cycle applied successfully",
 		"veg_registration_open":    details.VegRegistrationOpen,
 		"normal_registration_open": details.NormalRegistrationOpen,
+	})
+}
+
+func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
+	var details models.MessRegistrationDetails
+
+	if err := oc.DB.First(&details).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Could not fetch registration details")
+		return
+	}
+
+	type StatsResult struct {
+		Mess          int8
+		CurrentCount  int64
+		UpcomingCount int64
+	}
+
+	var stats []StatsResult
+
+	// Single query: count current (mess) and upcoming (next_mess)
+	if err := oc.DB.Model(&models.User{}).
+		Select(`mess,
+			COUNT(*) as current_count,
+			SUM(CASE WHEN next_mess = mess THEN 1 ELSE 0 END) as upcoming_count`).
+		Group("mess").
+		Scan(&stats).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to compute mess stats")
+		return
+	}
+
+	currentStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	upcomingStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+
+	for _, s := range stats {
+		currentStats[int(s.Mess)] = int(s.CurrentCount)
+		upcomingStats[int(s.Mess)] = int(s.UpcomingCount)
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"veg_registration_open":    details.VegRegistrationOpen,
+		"normal_registration_open": details.NormalRegistrationOpen,
+		"mess_a_ldh_capacity":      details.MessALDHCapacity,
+		"mess_a_udh_capacity":      details.MessAUDHCapacity,
+		"mess_b_ldh_capacity":      details.MessBLDHCapacity,
+		"mess_b_udh_capacity":      details.MessBUDHCapacity,
+		"veg_mess_capacity":        details.VegMessCapacity,
+		"current_mess": map[string]int{
+			"mess_a_ldh": currentStats[1],
+			"mess_a_udh": currentStats[2],
+			"mess_b_ldh": currentStats[3],
+			"mess_b_udh": currentStats[4],
+			"veg_mess":   currentStats[5],
+			"unassigned": currentStats[0],
+		},
+		"upcoming_mess": map[string]int{
+			"mess_a_ldh": upcomingStats[1],
+			"mess_a_udh": upcomingStats[2],
+			"mess_b_ldh": upcomingStats[3],
+			"mess_b_udh": upcomingStats[4],
+			"veg_mess":   upcomingStats[5],
+		},
 	})
 }
