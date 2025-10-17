@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/services"
@@ -241,9 +242,36 @@ func (m *MessController) RefreshCapacitiesHandler(c *gin.Context) {
 
 func (m *MessController) IsRegistrationOpen(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, map[string]bool{
-		// "regular": m.isRegistrationOpen(),
-		// "veg":     m.isVegRegistrationOpen(),
-		"regular": state.GetRegistrationStatusReg(),
-		"veg":     state.GetRegistrationStatusVeg(),
+		"regular": m.isRegistrationOpen(),
+		"veg":     m.isVegRegistrationOpen(),
+		// "regular": state.GetRegistrationStatusReg(),
+		// "veg":     state.GetRegistrationStatusVeg(),
 	})
+}
+
+func (m *MessController) isRegistrationOpen() bool {
+	// Get the start date from the database
+	var registrationDetails models.MessRegistrationDetails
+	if err := m.DB.First(&registrationDetails).Error; err != nil {
+		return false
+	}
+
+	// Check if the current date is within the registration period
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	currentTime := time.Now().In(istLocation)
+	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
+}
+
+func (m *MessController) isVegRegistrationOpen() bool {
+	// Get the start date from the database
+	var registrationDetails models.MessRegistrationDetails
+	if err := m.DB.First(&registrationDetails).Error; err != nil {
+		return false
+	}
+	
+	// Check if the current date is within the registration period
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	currentTime := time.Now().In(istLocation)
+	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
+
 }
