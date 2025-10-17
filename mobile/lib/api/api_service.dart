@@ -87,7 +87,7 @@ class ApiService {
 
   static Future<Map<String, dynamic>> getRegistrationStatus() async {
     final token = await getToken();
-    final url = Uri.parse('$baseUrl/students/isRegistrationOpen');
+    final url = Uri.parse('$baseUrl/students/');
 
     try {
       final headers = {

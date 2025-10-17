@@ -42,7 +42,7 @@ func GetMessName(messID int) string {
 
 // IsValidMessID checks if the mess ID is valid (1-4)
 func IsValidMessID(messID int) bool {
-	return messID >= MESS_A_LDH && messID <= MESS_B_UDH
+	return messID >= MESS_A_LDH && messID <= VEG_MESS
 }
 
 // Redis key patterns
@@ -59,6 +59,7 @@ const (
 	MESS_A_UDH = 2 // MessA Upper Dining Hall
 	MESS_B_LDH = 3 // MessB Lower Dining Hall
 	MESS_B_UDH = 4 // MessB Upper Dining Hall
+	VEG_MESS   = 5 // Vegetarian Mess
 	NO_MESS    = 0 // No mess assigned
 )
 

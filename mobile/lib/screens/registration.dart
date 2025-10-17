@@ -54,10 +54,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       if (response['error'] == null && response['data'] != null) {
         final data = response['data'] as Map<String, dynamic>;
 
+        print(data);
+
         setState(() {
           messStats = {
             'Mess-A_LDH': {
-              'current': data['mess1']?['registered'] ?? 0,
+              'current': data['mess1  ']?['registered'] ?? 0,
               'capacity': data['mess1']?['capacity'] ?? 0,
             },
             'Mess-A_UDH': {
