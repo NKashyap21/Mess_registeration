@@ -23,14 +23,12 @@ class ApiService {
       await http
           .post(url, headers: {'Accept': 'application/json'})
           .timeout(
-            const Duration(seconds: 5), // Add 5 second timeout
+            const Duration(seconds: 5),
             onTimeout: () {
-              // Return a fake response on timeout
               return http.Response('{"message": "timeout"}', 408);
             },
           );
     } catch (e) {
-      // Ignore logout errors - continue with local logout
       print('Logout API call failed: $e');
     }
   }
@@ -174,6 +172,8 @@ class ApiService {
 
       final response = await http.get(url, headers: headers);
 
+      print("MESS STATS RESPONSE: ${response.body}");
+
       return jsonDecode(response.body);
     } catch (e) {
       return {'error': 'Network error: $e'};
@@ -299,6 +299,25 @@ class ApiService {
       final body = jsonEncode({'type': type, 'user_id': userId});
 
       final response = await http.post(url, headers: headers, body: body);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'error': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getUserSwapRequest() async {
+    final token = await getToken();
+    final url = Uri.parse('$baseUrl/students/getSwapByID');
+
+    try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
 
       return jsonDecode(response.body);
     } catch (e) {

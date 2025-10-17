@@ -51,30 +51,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       final response = await ApiService.getMessStats();
 
-      if (response['error'] == null && response['data'] != null) {
-        final data = response['data'] as Map<String, dynamic>;
+      if (response['stats'] != null) {
+        final data = response['stats'] as Map<String, dynamic>;
 
         print(data);
 
         setState(() {
           messStats = {
             'Mess-A_LDH': {
-              'current': data['mess1  ']?['registered'] ?? 0,
-              'capacity': data['mess1']?['capacity'] ?? 0,
+              'current': data['MessA LDH']?['count'] ?? 0,
+              'capacity': data['MessA LDH']?['capacity'] ?? 0,
             },
             'Mess-A_UDH': {
-              'current': data['mess2']?['registered'] ?? 0,
-              'capacity': data['mess2']?['capacity'] ?? 0,
+              'current': data['MessA UDH']?['count'] ?? 0,
+              'capacity': data['MessA UDH']?['capacity'] ?? 0,
             },
             'Mess-B_LDH': {
-              'current': data['mess3']?['registered'] ?? 0,
-              'capacity': data['mess3']?['capacity'] ?? 0,
+              'current': data['MessB LDH']?['count'] ?? 0,
+              'capacity': data['MessB LDH']?['capacity'] ?? 0,
             },
             'Mess-B_UDH': {
-              'current': data['mess4']?['registered'] ?? 0,
-              'capacity': data['mess4']?['capacity'] ?? 0,
+              'current': data['MessB UDH']?['count'] ?? 0,
+              'capacity': data['MessB UDH']?['capacity'] ?? 0,
             },
           };
+
           isLoadingStats = false;
         });
       } else {

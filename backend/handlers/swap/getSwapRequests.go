@@ -33,7 +33,11 @@ func (sc *SwapController) GetSwapRequestsByID(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 
 	var swapRequest models.SwapRequest
-	err := sc.DB.Where("user_id = ?", userID).First(&swapRequest).Error
+	err := sc.DB.Table("swap_requests").
+		Select("swap_requests.*, users.email, users.name").
+		Joins("join users on users.id = swap_requests.user_id").
+		Where("swap_requests.user_id = ?", userID).
+		First(&swapRequest).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			utils.RespondWithError(c, http.StatusNotFound, "No swap request found for the user")
