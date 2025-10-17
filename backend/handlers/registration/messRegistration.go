@@ -261,8 +261,7 @@ func (m *MessController) isRegistrationOpen() bool {
 	log.Printf("Start time: %v, End time: %v\n", registrationDetails.NormalRegistrationStart, registrationDetails.NormalRegistrationEnd)
 
 	// Check if the current date is within the registration period
-	istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	currentTime := time.Now().In(istLocation)
+	currentTime := time.Now()
 	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
 }
 
@@ -274,7 +273,6 @@ func (m *MessController) isVegRegistrationOpen() bool {
 	}
 
 	// Check if the current date is within the registration period
-	istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	currentTime := time.Now().In(istLocation)
+	currentTime := time.Now()
 	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
 }
