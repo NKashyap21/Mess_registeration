@@ -8,6 +8,7 @@ import (
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (oc *OfficeController) GetStudents(c *gin.Context) {
@@ -21,7 +22,6 @@ func (oc *OfficeController) GetStudents(c *gin.Context) {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-
 	//In case the students are not found.
 	if result.RowsAffected == 0 {
 		utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "No students found."})
@@ -88,16 +88,171 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 
 }
 
+// func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
+// 	var registrationDetails models.MessRegistrationDetails
+
+// 	if err := utils.ParseJSONRequest(c, &registrationDetails); err != nil {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid payload")
+// 		return
+// 	}
+
+// 	// Check if payload tries to change veg registration dates
+// 	if !registrationDetails.VegRegistrationStart.IsZero() || !registrationDetails.VegRegistrationEnd.IsZero() {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change veg registration dates in normal registration endpoint")
+// 		return
+// 	}
+
+// 	// Update the dates in DB
+// 	if err := oc.DB.First(&registrationDetails, "WHERE 1=1").Error; err != nil {
+// 		if err == gorm.ErrRecordNotFound {
+// 			// Create new record
+// 			if err := oc.DB.Create(&registrationDetails).Error; err != nil {
+// 				log.Println(err)
+// 				utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+// 				return
+// 			}
+// 		} else {
+// 			log.Println(err)
+// 			utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+// 			return
+// 		}
+// 	}
+// }
+
+// func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
+// 	var registrationDetails models.MessRegistrationDetails
+
+// 	if err := utils.ParseJSONRequest(c, &registrationDetails); err != nil {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid payload")
+// 		return
+// 	}
+
+// 	// Check if payload tries to change normal registration dates
+// 	if !registrationDetails.NormalRegistrationStart.IsZero() || !registrationDetails.NormalRegistrationEnd.IsZero() {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change normal registration dates in veg registration endpoint")
+// 		return
+// 	}
+
+// 	// Update the dates in DB
+// 	if err := oc.DB.First(&registrationDetails, "WHERE 1=1").Error; err != nil {
+// 		if err == gorm.ErrRecordNotFound {
+// 			// Create new record
+// 			if err := oc.DB.Create(&registrationDetails).Error; err != nil {
+// 				log.Println(err)
+// 				utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+// 				return
+// 			}
+// 		} else {
+// 			log.Println(err)
+// 			utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+// 			return
+// 		}
+// 	}
+// }
+
 func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
-	if err := oc.DB.Set("normal_registration_open", !utils.GetNormalRegistrationStatus(oc.DB)).Error; err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle registration status")
-		return
+	var reg models.MessRegistrationDetails
+
+	// There should only be one row
+	if err := oc.DB.First(&reg).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create new record with NormalRegistrationOpen = true by default
+			reg = models.MessRegistrationDetails{NormalRegistrationOpen: true}
+			if err := oc.DB.Create(&reg).Error; err != nil {
+				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create registration details")
+				return
+			}
+		} else {
+			log.Println("Error fetching registration details:", err)
+			utils.RespondWithError(c, http.StatusInternalServerError, "Database error")
+			return
+		}
+	} else {
+		// Flip the normal registration state
+		reg.NormalRegistrationOpen = !reg.NormalRegistrationOpen
+		if err := oc.DB.Save(&reg).Error; err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle normal registration")
+			return
+		}
 	}
+
+	status := "closed"
+	if reg.NormalRegistrationOpen {
+		status = "open"
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message":                  "Normal registration toggled successfully",
+		"status":                   status,
+		"normal_registration_open": reg.NormalRegistrationOpen,
+		"veg_registration_open":    reg.VegRegistrationOpen,
+		"mess_a_ldh_capacity":      reg.MessALDHCapacity,
+		"mess_a_udh_capacity":      reg.MessAUDHCapacity,
+		"mess_b_ldh_capacity":      reg.MessBLDHCapacity,
+		"mess_b_udh_capacity":      reg.MessBUDHCapacity,
+		"veg_mess_capacity":        reg.VegMessCapacity,
+	})
 }
 
-func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
-	if err := oc.DB.Set("veg_registration_open", !utils.GetVegRegistrationStatus(oc.DB)).Error; err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to start veg registration")
+func (oc *OfficeController) ToggleVegRegistration(c *gin.Context) {
+	var reg models.MessRegistrationDetails
+
+	if err := oc.DB.First(&reg).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create new record with VegRegistrationOpen = true by default
+			reg = models.MessRegistrationDetails{VegRegistrationOpen: true}
+			if err := oc.DB.Create(&reg).Error; err != nil {
+				utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create registration details")
+				return
+			}
+		} else {
+			log.Println("Error fetching registration details:", err)
+			utils.RespondWithError(c, http.StatusInternalServerError, "Database error")
+			return
+		}
+	} else {
+		// Flip the veg registration state
+		reg.VegRegistrationOpen = !reg.VegRegistrationOpen
+		if err := oc.DB.Save(&reg).Error; err != nil {
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle veg registration")
+			return
+		}
+	}
+
+	status := "closed"
+	if reg.VegRegistrationOpen {
+		status = "open"
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"message":                  "Veg registration toggled successfully",
+		"status":                   status,
+		"normal_registration_open": reg.NormalRegistrationOpen,
+		"veg_registration_open":    reg.VegRegistrationOpen,
+		"mess_a_ldh_capacity":      reg.MessALDHCapacity,
+		"mess_a_udh_capacity":      reg.MessAUDHCapacity,
+		"mess_b_ldh_capacity":      reg.MessBLDHCapacity,
+		"mess_b_udh_capacity":      reg.MessBUDHCapacity,
+		"veg_mess_capacity":        reg.VegMessCapacity,
+	})
+}
+
+func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
+	var details models.MessRegistrationDetails
+
+	// Fetch the single record (you can use LIMIT 1 or WHERE 1=1)
+	if err := oc.DB.First(&details).Error; err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Could not fetch registration status")
 		return
 	}
+
+	utils.RespondWithJSON(c, http.StatusOK, gin.H{
+		"veg_registration_open":    details.VegRegistrationOpen,
+		"normal_registration_open": details.NormalRegistrationOpen,
+		"mess_a_ldh_capacity":      details.MessALDHCapacity,
+		"mess_a_udh_capacity":      details.MessAUDHCapacity,
+		"mess_b_ldh_capacity":      details.MessBLDHCapacity,
+		"mess_b_udh_capacity":      details.MessBUDHCapacity,
+		"veg_mess_capacity":        details.VegMessCapacity,
+	})
 }

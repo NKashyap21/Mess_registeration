@@ -55,3 +55,5 @@ build-errors.log
 # Node modules
 node_modules/
 .pnpm/
+
+deploy.sh
