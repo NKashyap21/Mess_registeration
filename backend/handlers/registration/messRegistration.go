@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/services"
 	"github.com/LambdaIITH/mess_registration/state"
@@ -251,27 +252,28 @@ func (m *MessController) IsRegistrationOpen(c *gin.Context) {
 
 func (m *MessController) isRegistrationOpen() bool {
 	// Get the start date from the database
-	var registrationDetails models.MessRegistrationDetails
+	var registrationDetails db.MessRegistrationDetails
 	if err := m.DB.First(&registrationDetails).Error; err != nil {
 		return false
 	}
 
 	// Check if the current date is within the registration period
-	istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	currentTime := time.Now().In(istLocation)
+	// istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	// currentTime := time.Now().In(istLocation)
+	currentTime := time.Now()
 	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
 }
 
 func (m *MessController) isVegRegistrationOpen() bool {
 	// Get the start date from the database
-	var registrationDetails models.MessRegistrationDetails
+	var registrationDetails db.MessRegistrationDetails
 	if err := m.DB.First(&registrationDetails).Error; err != nil {
 		return false
 	}
 	
 	// Check if the current date is within the registration period
-	istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	currentTime := time.Now().In(istLocation)
+	// istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	// currentTime := time.Now().In(istLocation)
+	currentTime := time.Now()
 	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
-
 }
