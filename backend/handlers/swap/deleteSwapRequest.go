@@ -25,7 +25,7 @@ func (sc *SwapController) DeleteSwapHandler(c *gin.Context) {
 	}
 
 	// Delete the existing swap request
-	err = sc.DB.Delete(&existingRequest).Error
+	err = sc.DB.Delete(&existingRequest, "user_id = ?", userID).Error
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete swap request")
 		return
