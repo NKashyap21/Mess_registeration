@@ -179,8 +179,10 @@ func (s *SyncService) syncUserRegistration(userID uint) error {
 
 	// Remove from pending sync queue
 	if err := s.redisService.RemoveFromPendingSync(userID); err != nil {
-		log.Printf("Warning: Failed to remove user %d from pending sync queue: %v", userID, err)
-	} 
+		log.Printf("ERROR: Failed to remove user %d from pending sync queue: %v", userID, err)
+		// Return error to retry sync later
+		return fmt.Errorf("failed to remove from pending sync: %w", err)
+	}
 
 	log.Printf("Successfully synced user %d with mess %d to database", userID, messID)
 	return nil

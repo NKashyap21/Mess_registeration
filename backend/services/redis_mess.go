@@ -232,7 +232,18 @@ func (r *RedisMessService) GetPendingSyncUsers() ([]string, error) {
 
 // RemoveFromPendingSync removes a user from the pending sync queue
 func (r *RedisMessService) RemoveFromPendingSync(userID uint) error {
-	return r.client.SRem(r.ctx, PENDING_SYNC_KEY, strconv.FormatUint(uint64(userID), 10)).Err()
+	userIDStr := strconv.FormatUint(uint64(userID), 10)
+	result := r.client.SRem(r.ctx, PENDING_SYNC_KEY, userIDStr)
+	if result.Err() != nil {
+		return result.Err()
+	}
+
+	// Log if the user was actually removed (result should be 1 if removed, 0 if not found)
+	if result.Val() == 0 {
+		return fmt.Errorf("user %d not found in pending sync queue", userID)
+	}
+
+	return nil
 }
 
 // ClearUserRegistration removes a user's mess assignment (for rollback scenarios)
