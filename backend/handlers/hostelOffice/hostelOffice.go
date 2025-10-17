@@ -87,13 +87,14 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{"message": "Success Updating the user information."})
 
 }
+
 func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
 	if !state.GetRegistrationStatusReg() {
 		state.ChangeRegistrationStatusReg(true)
-		utils.RespondWithJSON(c, http.StatusOK, "Regualr Registeration Started.")
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Started.")
 		return
 	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration has already started.")
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration has already started.")
 		return
 	}
 }
@@ -101,10 +102,10 @@ func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
 func (oc *OfficeController) EndRegRegistration(c *gin.Context) {
 	if state.GetRegistrationStatusReg() {
 		state.ChangeRegistrationStatusReg(false)
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration Ended.")
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Ended.")
 		return
 	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Regular Registeration Ended Already.")
+		utils.RespondWithJSON(c, http.StatusOK, "Regular Registration Ended Already.")
 		return
 	}
 
@@ -113,10 +114,10 @@ func (oc *OfficeController) EndRegRegistration(c *gin.Context) {
 func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
 	if !state.GetRegistrationStatusVeg() {
 		state.ChangeRegistrationStatusVeg(true)
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Started.")
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Started.")
 		return
 	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration has already started.")
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration has already started.")
 		return
 	}
 }
@@ -124,10 +125,10 @@ func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
 func (oc *OfficeController) EndVegRegistration(c *gin.Context) {
 	if state.GetRegistrationStatusVeg() {
 		state.ChangeRegistrationStatusVeg(false)
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Ended.")
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Ended.")
 		return
 	} else {
-		utils.RespondWithJSON(c, http.StatusOK, "Veg Registeration Ended Already.")
+		utils.RespondWithJSON(c, http.StatusOK, "Veg Registration Ended Already.")
 		return
 	}
 
