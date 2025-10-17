@@ -158,8 +158,8 @@ func (r *RedisMessService) AttemptMessRegistration(userID uint, messID int) (boo
 			pipe.Incr(r.ctx, counterKey)
 			// Set user's mess
 			pipe.Set(r.ctx, userMessKey, messID, 0)
-			// Add user to pending sync queue
-			pipe.SAdd(r.ctx, PENDING_SYNC_KEY, userID)
+			// Add user to pending sync queue (as string for consistency)
+			pipe.SAdd(r.ctx, PENDING_SYNC_KEY, strconv.FormatUint(uint64(userID), 10))
 			return nil
 		})
 
@@ -243,7 +243,7 @@ func (r *RedisMessService) ClearUserRegistration(userID uint, messID int) error 
 	pipe := r.client.Pipeline()
 	pipe.Decr(r.ctx, counterKey)
 	pipe.Del(r.ctx, userMessKey)
-	pipe.SRem(r.ctx, PENDING_SYNC_KEY, userID)
+	pipe.SRem(r.ctx, PENDING_SYNC_KEY, strconv.FormatUint(uint64(userID), 10))
 
 	_, err := pipe.Exec(r.ctx)
 	return err
