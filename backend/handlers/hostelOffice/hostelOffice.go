@@ -153,8 +153,7 @@ func (oc *OfficeController) EditStudentById(c *gin.Context) {
 
 func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
 	// Toggle NormalRegistrationOpen for the first row
-	if err := oc.DB.Model(&db.MessRegistrationDetails{}).
-		Limit(1).
+	if err := oc.DB.Model(&db.MessRegistrationDetails{}).Session(&gorm.Session{AllowGlobalUpdate: true}).
 		Update("normal_registration_open", gorm.Expr("NOT normal_registration_open")).
 		Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle normal registration")
@@ -168,8 +167,7 @@ func (oc *OfficeController) ToggleNormalRegistration(c *gin.Context) {
 
 func (oc *OfficeController) ToggleVegRegistration(c *gin.Context) {
 	// Toggle VegRegistrationOpen for the first row
-	if err := oc.DB.Model(&db.MessRegistrationDetails{}).
-		Limit(1).
+	if err := oc.DB.Model(&db.MessRegistrationDetails{}).Session(&gorm.Session{AllowGlobalUpdate: true}).
 		Update("veg_registration_open", gorm.Expr("NOT veg_registration_open")).
 		Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to toggle veg registration")

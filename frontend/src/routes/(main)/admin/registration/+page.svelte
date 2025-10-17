@@ -17,11 +17,11 @@
 			<div class="flex flex-col">
 				<div class="text-xl font-semibold">Current Stats</div>
 				<div class="flex flex-col">
-					<div class="flex flex-col gap-y-8">
+					<div class="flex flex-col gap-y-6">
 						{#each Object.keys(data.status['current_mess']) as messName}
 							<section class="flex flex-row">
 								<h2 class=" min-w-[6rem] text-xl font-bold">{messName}</h2>
-								<div class="flex flex-col gap-y-4">
+								<div class="flex flex-col gap-y-2">
 									{#each Object.keys(data.status['current_mess'][messName]) as hall, idx}
 										<div class="flex items-center">
 											<h3 class="w-[8rem] text-xl">{hall}</h3>
@@ -49,16 +49,16 @@
 			<div class="flex flex-col">
 				<div class="text-xl font-semibold">Upcoming Stats</div>
 				<div class="flex flex-col">
-					<div class="flex flex-col gap-y-8">
+					<div class="flex flex-col gap-y-6">
 						{#each Object.keys(data.status['upcoming_mess']) as messName}
 							<section class="flex flex-row">
 								<h2 class="w-[6rem] text-xl font-bold">{messName}</h2>
-								<div class="flex flex-col gap-y-4">
+								<div class="flex flex-col gap-y-2">
 									{#each Object.keys(data.status['upcoming_mess'][messName]) as hall, idx}
 										<div class="flex items-center">
 											<h3 class="w-[8rem] text-xl">{hall}</h3>
 											<Progress
-												outerClass="min-w-[30rem]"
+												outerClass="min-w-[30rem] "
 												innerClass={idx % 2 == 0
 													? 'bg-[#919191] dark:bg-[#B4B4B4]'
 													: 'bg-custom-light-orange'}
