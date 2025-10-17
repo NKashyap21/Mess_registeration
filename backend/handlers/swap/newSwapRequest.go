@@ -51,7 +51,7 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 	// Check if there is a public request already floating with the opposite direction
 	// If yes, auto accept both requests and update mess of both users
 	var oppositeRequest models.SwapRequest
-	err = sc.DB.First(&oppositeRequest, "direction = ? AND is_accepted = ?",
+	err = sc.DB.First(&oppositeRequest, "direction = ? AND completed = ?",
 		map[string]string{"A to B": "B to A", "B to A": "A to B"}[swapRequest.Direction], false).Error
 	if err == nil {
 		// Found an opposite request, auto accept both
@@ -86,6 +86,7 @@ func (sc *SwapController) CreateSwapRequestHandler(c *gin.Context) {
 			return
 		}
 	}
+
 	err = sc.DB.Create(&swapRequest).Error
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create swap request")

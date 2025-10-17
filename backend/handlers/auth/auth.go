@@ -39,7 +39,7 @@ func (a *AuthController) handleMobileLogin(c *gin.Context) {
 		Token string `json:"token"`
 	}
 
-	if err := c.ShouldBindJSON(&payload); err != nil {
+	if err := utils.ParseJSONRequest(c, &payload); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
 		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid JSON payload", c.ClientIP())
 		return
@@ -223,27 +223,3 @@ func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 	// // Find user by encrypted email
 }
 
-// Function to verify Google ID token
-func (a *AuthController) verifyGoogleIDToken(token string) (map[string]interface{}, error) {
-	req, err := utils.CreateHTTPRequest("https://oauth2.googleapis.com/token?code="+token, "POST", nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := utils.SendHTTPRequest(req, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("invalid token")
-	}
-
-	var idInfo map[string]interface{}
-	if err := utils.ParseJSONResponse(resp, &idInfo); err != nil {
-		return nil, err
-	}
-
-	return idInfo, nil
-}
