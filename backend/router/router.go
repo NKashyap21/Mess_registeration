@@ -82,7 +82,7 @@ func SetupRouter() *gin.Engine {
 	hostelOffice.GET("/logs/export", logsController.ExportLogsHandler)
 	hostelOffice.GET("/logs/range", logsController.GetLogsByDateRangeHandler)
 	hostelOffice.POST("/refreshCapacities", registrationController.RefreshCapacitiesHandler)
-	hostelOffice.POST("/start-registration/reg", officeController.StartRegRegistration)
+	hostelOffice.POST("/start-registration/reg", officeController.ToggleNormalRegistration)
 	hostelOffice.POST("/start-registration/veg", officeController.StartVegRegistration)
 	hostelOffice.PUT("/students/", officeController.EditStudentById)
 

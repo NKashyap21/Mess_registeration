@@ -8,7 +8,6 @@ import (
 	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/services"
-	"github.com/LambdaIITH/mess_registration/state"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +15,7 @@ import (
 func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 	logger := services.GetLoggerService()
 
-	if !state.GetRegistrationStatusReg() {
+	if !utils.GetNormalRegistrationStatus(m.DB) {
 		utils.RespondWithError(c, http.StatusForbidden, "Registration Has Ended.")
 		return
 	}
@@ -98,7 +97,7 @@ func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 	// Only accept requests on this endpoint at a specified date
 	// Check if the current date is within the registration period
 
-	if !state.GetRegistrationStatusVeg() {
+	if !utils.GetVegRegistrationStatus(m.DB) {
 		utils.RespondWithJSON(c, http.StatusForbidden, "Registration Has Ended.")
 		return
 	}
