@@ -4,13 +4,17 @@ import { PRIVATE_API_URL } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const data = await parent();
-	if (
-		data.user.mess_id != 'No mess assigned' ||
-		data.userMessData.status == 'pending_sync' ||
-		data.userMessData.status == 'confirmed'
-	) {
+	if (data.user.mess_id != 'No mess assigned') {
 		throw redirect(307, '/');
 	}
+	return {
+		messStats: await (
+			await fetch(PRIVATE_API_URL + '/students/messStatsGrouped', {
+				method: 'GET',
+				credentials: 'include'
+			})
+		).json()
+	};
 };
 
 export const actions = {

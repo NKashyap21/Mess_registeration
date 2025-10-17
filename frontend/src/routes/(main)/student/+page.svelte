@@ -16,30 +16,43 @@
 	<p>Current Registered Mess :</p>
 	<p>{data.user.mess_id}</p>
 	<p>Next registration date :</p>
-	<p>Today</p>
+	<p>Unknown</p>
 	<p>Registration Status :</p>
 	<p>
-		{data.regData.regular
-			? 'Registration Active Now'
+		{data.regData.regular && data.regData.veg
+			? 'Regular and Veg Registration Active Now'
 			: data.regData.veg
 				? 'Veg Registration Active Now'
-				: 'Inactive'}
+				: data.regData.regular
+					? 'Regular Registration Active Now'
+					: 'Inactive'}
 	</p>
 
-	{#if !registered}
-		<Button
-			disabled={!(data.regData.regular || data.regData.veg)}
-			onclick={() => {
-				goto('student/register');
-			}}
-			class="col-span-2 mx-auto mt-16">Go for {data.regData.veg ? 'Veg' : ''} Registration</Button
-		>
-	{:else}
-		<Button
-			onclick={() => {
-				goto('student/swap');
-			}}
-			class="col-span-2 mx-auto mt-16">Swap Mess</Button
-		>
-	{/if}
+	<div class="col-span-2 mx-auto mt-16 flex gap-x-8">
+		{#if !registered}
+			{#if data.regData.regular}
+				<Button
+					onclick={() => {
+						goto('student/register?veg=false');
+					}}
+					class="">Go for Regular Registration</Button
+				>
+			{/if}
+			{#if data.regData.veg}
+				<Button
+					onclick={() => {
+						goto('student/register?veg=true');
+					}}
+					class="">Go for Veg Registration</Button
+				>
+			{/if}
+		{:else}
+			<Button
+				onclick={() => {
+					goto('student/swap');
+				}}
+				class="">Swap Mess</Button
+			>
+		{/if}
+	</div>
 </section>

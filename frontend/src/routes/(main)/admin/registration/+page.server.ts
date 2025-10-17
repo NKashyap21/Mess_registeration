@@ -5,14 +5,8 @@ export const ssr = false;
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	return {
-		registrationState: await (
-			await fetch(PRIVATE_API_URL + '/students/isRegistrationOpen', {
-				method: 'get',
-				credentials: 'include'
-			})
-		).json(),
-		messStats: await (
-			await fetch(PRIVATE_API_URL + '/office/messStatsGrouped', {
+		status: await (
+			await fetch(PRIVATE_API_URL + '/office/status', {
 				method: 'GET',
 				credentials: 'include'
 			})

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import Button from '$lib/components/common/Button.svelte';
 	import Progress from '$lib/components/common/Progress.svelte';
 
@@ -21,9 +22,9 @@
 	method="post"
 >
 	<h1 class="absolute top-12 right-0 left-0 mx-auto w-fit text-[2.5rem] font-semibold">
-		Mess Registration
+		{page.url.searchParams.get('veg') == 'true' ? 'Veg' : 'Regular'} Mess Registration
 	</h1>
-	<input hidden value={data.regData.veg} name="veg" />
+	<input hidden value={page.url.searchParams.get('veg')} name="veg" />
 	{#each Object.keys(data.messStats.stats) as messName}
 		<section class="flex flex-row">
 			<h2 class="mr-12 w-[8rem] text-3xl font-bold">{messName}</h2>
