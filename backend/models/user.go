@@ -13,8 +13,8 @@ type User struct {
 	Email       string    `json:"email" gorm:"uniqueIndex;not null" validate:"required,email"`
 	Phone       string    `json:"phone" gorm:"uniqueIndex" validate:"required,min=10,max=15"`
 	RollNo      string    `json:"roll_no" gorm:"uniqueIndex" validate:"required"`
-	Mess        int8      `json:"mess" validate:"required,oneof=1 2 3 4 0" default:"0"`
-	NextMess    int8      `json:"-" validate:"oneof=1 2 3 4 5 0" default:"0"`
+	Mess        int8      `json:"mess" validate:"required,oneof=1 2 3 4 0" gorm:"default:0"`
+	NextMess    int8      `json:"-" validate:"oneof=1 2 3 4 5 0" gorm:"default:0"`
 	Type        int8      `json:"type" gorm:"default:0" validate:"oneof=0 1 2"`
 	CanRegister bool      `json:"can_register" gorm:"default:true"`
 }

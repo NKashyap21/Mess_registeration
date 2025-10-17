@@ -217,7 +217,7 @@ func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	}
 
 	// Step 4: Copy next_mess → mess
-	if err := tx.Exec(`UPDATE users SET mess = next_mess WHERE next_mess IS NOT NULL AND next_mess != 0`).Error; err != nil {
+	if err := tx.Exec(`UPDATE users SET mess = next_mess WHERE next_mess IS NOT NULL`).Error; err != nil {
 		tx.Rollback()
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to copy next_mess to mess")
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -42,6 +43,16 @@ func ConnectDatabase() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
+	sqlDB, err := DB.DB()
+
+	if err != nil {
+		log.Fatal("Failed to open underlying sql conn:", err)
+	}
+
+	sqlDB.SetMaxOpenConns(30)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(1 * time.Hour)
+	sqlDB.SetConnMaxIdleTime(10 * time.Minute)
 
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)

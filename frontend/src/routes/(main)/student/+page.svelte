@@ -4,7 +4,7 @@
 	import MainPanelHeader from '$lib/components/common/MainPanelHeader.svelte';
 
 	let { data } = $props();
-	let registered = $state(data.user.mess_id != 'No mess assigned');
+	let registered = $state(data.userMessData.next_mess != 0);
 	console.log(data);
 </script>
 
@@ -14,7 +14,22 @@
 	class="grid grid-cols-2 gap-x-8 gap-y-14 px-24 pt-24 pb-6 text-3xl leading-none font-medium text-custom-black dark:text-custom-off-white"
 >
 	<p>Current Registered Mess :</p>
-	<p>{data.user.mess_id}</p>
+	<p>
+		{data.user.mess_id}<br />
+		{#if data.userMessData.status == 'pending_sync'}
+			<span class="mt-3 block text-2xl">
+				Pending assignment to {data.userMessData.mess == 1
+					? 'Mess A (LDH)'
+					: data.userMessData.mess == 2
+						? 'Mess A (UDH)'
+						: data.userMessData.mess == 3
+							? 'Mess B (LDH)'
+							: data.userMessData.mess == 4
+								? 'Mess B (UDH)'
+								: 'Unknown'}
+			</span>
+		{/if}
+	</p>
 	<p>Next registration date :</p>
 	<p>Unknown</p>
 	<p>Registration Status :</p>
@@ -33,7 +48,7 @@
 			{#if data.regData.regular}
 				<Button
 					disabled={data.userMessData.status == 'pending_sync' ||
-						(data.userMessData.status == 'confirmed' && !registered)}
+						(data.userMessData.status == 'confirmed' && registered)}
 					onclick={() => {
 						goto('student/register?veg=false');
 					}}
@@ -43,20 +58,21 @@
 			{#if data.regData.veg}
 				<Button
 					disabled={data.userMessData.status == 'pending_sync' ||
-						(data.userMessData.status == 'confirmed' && !registered)}
+						(data.userMessData.status == 'confirmed' && registered)}
 					onclick={() => {
 						goto('student/register?veg=true');
 					}}
 					class="">Go for Veg Registration</Button
 				>
 			{/if}
-		{:else}
-			<Button
-				onclick={() => {
-					goto('student/swap');
-				}}
-				class="">Swap Mess</Button
-			>
+			{#if data.userMessData.current_mess != 0}
+				<Button
+					onclick={() => {
+						goto('student/swap');
+					}}
+					class="">Swap Mess</Button
+				>
+			{/if}
 		{/if}
 	</div>
 </section>
