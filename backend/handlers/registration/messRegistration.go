@@ -2,10 +2,8 @@ package registration
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
@@ -39,10 +37,10 @@ func (m *MessController) MessRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	// Check if user already has a mess assigned (check both DB and Redis)
-	if user.Mess != 0 {
-		utils.RespondWithError(c, http.StatusBadRequest, "User already has a mess assigned")
-		logger.LogUserAction(userID, "MESS_REGISTRATION_FAILED", fmt.Sprintf("User already has mess %d assigned", user.Mess), c.ClientIP())
+	// Check if user already has a mess assigned for next period (check both DB and Redis)
+	if user.NextMess != 0 {
+		utils.RespondWithError(c, http.StatusBadRequest, "User already has a mess assigned for next period")
+		logger.LogUserAction(userID, "MESS_REGISTRATION_FAILED", fmt.Sprintf("User already has NextMess %d assigned", user.NextMess), c.ClientIP())
 		return
 	}
 
@@ -118,9 +116,9 @@ func (m *MessController) VegMessRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	// Check if user already has a mess assigned (check both DB and Redis)
-	if user.Mess != 0 {
-		utils.RespondWithError(c, http.StatusBadRequest, "User already has a mess assigned")
+	// Check if user already has a mess assigned for next period (check both DB and Redis)
+	if user.NextMess != 0 {
+		utils.RespondWithError(c, http.StatusBadRequest, "User already has a mess assigned for next period")
 		return
 	}
 
@@ -217,9 +215,11 @@ func (m *MessController) GetUserMessHandler(c *gin.Context) {
 	}
 
 	utils.RespondWithJSON(c, http.StatusOK, gin.H{
-		"mess":      user.Mess,
-		"mess_name": services.GetMessName(int(user.Mess)),
-		"status":    "confirmed",
+		"current_mess":      user.Mess,
+		"current_mess_name": services.GetMessName(int(user.Mess)),
+		"next_mess":         user.NextMess,
+		"next_mess_name":    services.GetMessName(int(user.NextMess)),
+		"status":            "confirmed",
 	})
 }
 
@@ -252,27 +252,23 @@ func (m *MessController) IsRegistrationOpen(c *gin.Context) {
 }
 
 func (m *MessController) isRegistrationOpen() bool {
-	// Get the start date from the database
+	// Check if normal registration is open from the database
+
 	var registrationDetails db.MessRegistrationDetails
 	if err := m.DB.First(&registrationDetails).Error; err != nil {
 		return false
 	}
 
-	log.Printf("Start time: %v, End time: %v\n", registrationDetails.NormalRegistrationStart, registrationDetails.NormalRegistrationEnd)
-
-	// Check if the current date is within the registration period
-	currentTime := time.Now()
-	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
+	return registrationDetails.NormalRegistrationOpen
 }
 
 func (m *MessController) isVegRegistrationOpen() bool {
-	// Get the start date from the database
+	// Check if veg registration is open from the database
+
 	var registrationDetails db.MessRegistrationDetails
 	if err := m.DB.First(&registrationDetails).Error; err != nil {
 		return false
 	}
 
-	// Check if the current date is within the registration period
-	currentTime := time.Now()
-	return currentTime.After(registrationDetails.VegRegistrationStart) && currentTime.Before(registrationDetails.VegRegistrationEnd)
+	return registrationDetails.VegRegistrationOpen
 }

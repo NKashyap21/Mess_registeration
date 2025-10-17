@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"time"
+	// "time"
 
 	"github.com/LambdaIITH/mess_registration/config"
 	"github.com/LambdaIITH/mess_registration/models"
@@ -19,7 +19,7 @@ func SeedDatabase() {
 	}
 	if messCount == 0 {
 		record := models.MessRegistrationDetails{
-			VegRegistrationStart: time.Date(2025, 10, 12, 0, 0, 0, 0, time.UTC),
+			// VegRegistrationStart: time.Date(2025, 10, 12, 0, 0, 0, 0, time.UTC),
 			MessBLDHCapacity:     100,
 			MessBUDHCapacity:     120,
 		}

@@ -35,8 +35,7 @@ func (s *SyncService) isRegistrationOpen() bool {
 		return false
 	}
 
-	currentTime := time.Now()
-	return currentTime.After(registrationDetails.NormalRegistrationStart) && currentTime.Before(registrationDetails.NormalRegistrationEnd)
+	return registrationDetails.NormalRegistrationOpen
 }
 
 // StartBackgroundSync starts the background sync process
@@ -156,17 +155,17 @@ func (s *SyncService) syncUserRegistration(userID uint) error {
 		return err
 	}
 
-	// Check if user already has a different mess assigned in DB
-	if user.Mess != 0 && user.Mess != int8(messID) {
+	// Check if user already has a different mess assigned in NextMess
+	if user.NextMess != 0 && user.NextMess != int8(messID) {
 		tx.Rollback()
-		log.Printf("Conflict: User %d has mess %d in DB but %d in Redis", userID, user.Mess, messID)
+		log.Printf("Conflict: User %d has NextMess %d in DB but %d in Redis", userID, user.NextMess, messID)
 		// Remove from Redis to avoid further conflicts
 		s.redisService.ClearUserRegistration(userID, messID)
 		return nil
 	}
 
-	// Update user's mess in database
-	user.Mess = int8(messID)
+	// Update user's NextMess in database
+	user.NextMess = int8(messID)
 	if err := tx.Save(&user).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -212,9 +211,10 @@ func (s *SyncService) InitializeRedisFromDB() error {
 	}
 
 	// Count current registrations in database and sync to Redis
+	// Using NextMess column as that's where new registrations are stored
 	for messID := 1; messID <= 5; messID++ {
 		var count int64
-		if err := s.db.Model(&models.User{}).Where("mess = ?", messID).Count(&count).Error; err != nil {
+		if err := s.db.Model(&models.User{}).Where("next_mess = ?", messID).Count(&count).Error; err != nil {
 			return err
 		}
 
@@ -227,15 +227,15 @@ func (s *SyncService) InitializeRedisFromDB() error {
 		log.Printf("Initialized mess %d: %d/%d registrations", messID, count, capacities[messID])
 	}
 
-	// Get all users with mess assignments and sync to Redis
+	// Get all users with NextMess assignments and sync to Redis
 	var users []models.User
-	if err := s.db.Where("mess > 0").Find(&users).Error; err != nil {
+	if err := s.db.Where("next_mess > 0").Find(&users).Error; err != nil {
 		return err
 	}
 
 	for _, user := range users {
 		userMessKey := fmt.Sprintf("user:%d:mess", user.ID)
-		if err := s.redisService.client.Set(s.redisService.ctx, userMessKey, user.Mess, 0).Err(); err != nil {
+		if err := s.redisService.client.Set(s.redisService.ctx, userMessKey, user.NextMess, 0).Err(); err != nil {
 			log.Printf("Warning: Failed to sync user %d to Redis: %v", user.ID, err)
 		}
 	}

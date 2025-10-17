@@ -97,7 +97,7 @@ func (oc *OfficeController) StartRegRegistration(c *gin.Context) {
 	}
 
 	// Check if payload tries to change veg registration dates
-	if !registrationDetails.VegRegistrationStart.IsZero() || !registrationDetails.VegRegistrationEnd.IsZero() {
+	if registrationDetails.VegRegistrationOpen {
 		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change veg registration dates in normal registration endpoint")
 		return
 	}
@@ -128,7 +128,7 @@ func (oc *OfficeController) StartVegRegistration(c *gin.Context) {
 	}
 
 	// Check if payload tries to change normal registration dates
-	if !registrationDetails.NormalRegistrationStart.IsZero() || !registrationDetails.NormalRegistrationEnd.IsZero() {
+	if !registrationDetails.NormalRegistrationOpen {
 		utils.RespondWithError(c, http.StatusBadRequest, "Cannot change normal registration dates in veg registration endpoint")
 		return
 	}
