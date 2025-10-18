@@ -266,18 +266,26 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 	var stats []StatsResult
 
 	// Single query: count current (mess) and upcoming (next_mess)
-	if err := oc.DB.Model(&models.User{}).
-		Select(`mess,
-			COUNT(*) as current_count,
-			SUM(CASE WHEN next_mess = mess THEN 1 ELSE 0 END) as upcoming_count`).
-		Group("mess").
-		Scan(&stats).Error; err != nil {
+	query := `
+	SELECT
+		m.mess,
+		coalesce(COUNT(u1.id),0) AS current_count,
+		coalesce(COUNT(u2.id),0) AS upcoming_count
+	FROM
+		(VALUES (1), (2), (3), (4), (5)) AS m(mess)
+	LEFT JOIN users u1 ON u1.mess = m.mess
+	LEFT JOIN users u2 ON u2.next_mess = m.mess 
+	GROUP BY
+		m.mess
+	`
+
+	if err := oc.DB.Raw(query).Scan(&stats).Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to compute mess stats")
 		return
 	}
 
-	currentStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-	upcomingStats := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	currentStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+	upcomingStats := map[int]int{0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
 	for _, s := range stats {
 		currentStats[int(s.Mess)] = int(s.CurrentCount)

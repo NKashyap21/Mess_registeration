@@ -8,7 +8,7 @@ type User struct {
 	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 	Name        string    `json:"name" gorm:"not null" validate:"required,min=2,max=100"`
 	Email       string    `json:"email" gorm:"uniqueIndex;not null" validate:"required,email"`
-	Phone       string    `json:"phone" gorm:"uniqueIndex" validate:"required,min=10,max=15"`
+	Phone       *string   `json:"phone" gorm:"uniqueIndex" validate:"required,min=10,max=15"`
 	RollNo      string    `json:"roll_no" gorm:"uniqueIndex" validate:"required"`
 	Mess        int8      `json:"mess" validate:"required,oneof=1 2 3 4 0" default:"0"`
 	NextMess    int8      `json:"next_mess" validate:"oneof=1 2 3 4 5 0" default:"0"`

@@ -15,7 +15,11 @@
 >
 	<p>Current Registered Mess :</p>
 	<p>
-		{data.user.mess_id}<br />
+		{data.userMessData?.current_mess_name ?? 'Unknown'}
+	</p>
+	<p>Next Registration :</p>
+	<p>
+		{data.userMessData?.next_mess_name ?? 'Unknown'}<br />
 		{#if data.userMessData.status == 'pending_sync'}
 			<span class="mt-3 block text-2xl">
 				Pending assignment to {data.userMessData.mess == 1
@@ -26,12 +30,12 @@
 							? 'Mess B (LDH)'
 							: data.userMessData.mess == 4
 								? 'Mess B (UDH)'
-								: 'Unknown'}
+								: data.userMessData.mess == 5
+									? 'Veg Mess'
+									: 'Unknown'}
 			</span>
 		{/if}
 	</p>
-	<p>Next registration date :</p>
-	<p>Unknown</p>
 	<p>Registration Status :</p>
 	<p>
 		{data.regData.regular && data.regData.veg
