@@ -87,6 +87,7 @@ func SetupRouter() *gin.Engine {
 	hostelOffice.PUT("/students/", officeController.EditStudentById)
 	hostelOffice.GET("/status", officeController.GetRegistrationStatus)
 	hostelOffice.POST("/apply-new-registration", officeController.ApplyNewRegistration)
+	hostelOffice.POST("/add-user", officeController.AddNewUser)
 
 	return r
 }

@@ -58,6 +58,8 @@ services:
       - "3000:3000"
     networks:
       - frontend
+    environment:
+      ORIGIN: https://mess.iith.dev
 
   redis:
     image: redis:7-alpine

@@ -29,8 +29,8 @@ COPY --from=builder /app/build ./build
 # Environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
-# ENV ORIGIN=https://mess.iith.dev
-ENV ORIGIN=http://localhost:3000
+ENV ORIGIN=https://mess.iith.dev
+# ENV ORIGIN=http://localhost:3000
 
 EXPOSE 3000
 
