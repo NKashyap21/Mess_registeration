@@ -278,8 +278,8 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 		coalesce(COUNT(u2.id),0) AS upcoming_count
 	FROM
 		(VALUES (1), (2), (3), (4), (5)) AS m(mess)
-	LEFT JOIN users u1 ON u1.mess = m.mess
-	LEFT JOIN users u2 ON u2.next_mess = m.mess 
+	LEFT JOIN users u1 ON u1.mess = m.mess and u1.can_register
+	LEFT JOIN users u2 ON u2.next_mess = m.mess and u2.can_register
 	GROUP BY
 		m.mess
 	`
