@@ -363,17 +363,22 @@ func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 
 func (oc *OfficeController) AddNewUser(c *gin.Context) {
 	var input struct {
-		Name   string `json:"name" binding:"required,min=2,max=100"`
-		RollNo string `json:"roll_no" binding:"required"`
-		Type   int8   `json:"type" binding:"required,oneof=0 1 2"`
-		Phone  string `json:"phone"`                            // optional
-		Mess   int8   `json:"mess" binding:"oneof=0 1 2 3 4 5"` // optional, but validated
+		Name   string  `json:"name" binding:"required,min=2,max=100"`
+		RollNo string  `json:"roll_no" binding:"required"`
+		Email  string  `json:"email" binding:"required"`
+		Type   int8    `json:"user_type"`
+		Phone  *string `json:"phone"`                            // optional
+		Mess   int8    `json:"mess" binding:"oneof=0 1 2 3 4 5"` // optional, but validated
 	}
 
 	// Bind JSON
 	if err := c.ShouldBindJSON(&input); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
+	}
+	canRegister := false
+	if input.Type == 0 {
+		canRegister = true
 	}
 
 	// Create user model
@@ -383,8 +388,9 @@ func (oc *OfficeController) AddNewUser(c *gin.Context) {
 		Type:        input.Type,
 		Phone:       input.Phone,
 		Mess:        input.Mess,
-		NextMess:    0,    // default unassigned
-		CanRegister: true, // default
+		Email:       input.Email,
+		NextMess:    0,           // default unassigned
+		CanRegister: canRegister, // default
 	}
 
 	// Insert into DB

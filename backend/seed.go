@@ -20,8 +20,8 @@ func SeedDatabase() {
 	if messCount == 0 {
 		record := models.MessRegistrationDetails{
 			// VegRegistrationStart: time.Date(2025, 10, 12, 0, 0, 0, 0, time.UTC),
-			MessBLDHCapacity:     100,
-			MessBUDHCapacity:     120,
+			MessBLDHCapacity: 100,
+			MessBUDHCapacity: 120,
 		}
 		if err := db.Create(&record).Error; err != nil {
 			log.Fatal("Failed to insert default mess_registration_details:", err)
@@ -38,7 +38,7 @@ func SeedDatabase() {
 		user := models.User{
 			Name:        "Test User MUQ",
 			Email:       "es23btech11028@iith.ac.in",
-			Phone:       "9999999999",
+			Phone:       nil,
 			RollNo:      "es23btech11028",
 			Mess:        0,
 			Type:        0,
