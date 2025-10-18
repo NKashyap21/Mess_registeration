@@ -35,7 +35,7 @@ func (s *SyncService) isRegistrationOpen() bool {
 		return false
 	}
 
-	return registrationDetails.NormalRegistrationOpen
+	return registrationDetails.NormalRegistrationOpen || registrationDetails.VegRegistrationOpen
 }
 
 // StartBackgroundSync starts the background sync process

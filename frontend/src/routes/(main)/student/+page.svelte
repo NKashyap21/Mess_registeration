@@ -15,7 +15,7 @@
 >
 	<p>Current Registered Mess :</p>
 	<p>
-		{data.userMessData?.current_mess_name ?? 'Unknown'}
+		{data.user.mess_id ?? 'Unknown'}
 	</p>
 	<p>Next Registration :</p>
 	<p>
@@ -69,7 +69,7 @@
 					class="">Go for Veg Registration</Button
 				>
 			{/if}
-			{#if data.userMessData.current_mess != 0}
+			{#if data.userMessData.current_mess != 0 && (data.userMessData?.current_mess ?? 5) != 5}
 				<Button
 					onclick={() => {
 						goto('student/swap');

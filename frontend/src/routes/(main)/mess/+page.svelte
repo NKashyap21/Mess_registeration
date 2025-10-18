@@ -7,7 +7,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { Dialog } from 'bits-ui';
 	import { PUBLIC_API_URL } from '$env/static/public';
-	let messValue = $state('Choose a mess');
 	let messTimeValue = $state('Time');
 	// const messSelectItems = [
 	// 	{ label: 'Mess A', value: 'Mess A' },
@@ -37,7 +36,11 @@
 				onkeydown={async (ev) => {
 					if (ev.key == 'Enter') {
 						const res = await fetch(
-							PUBLIC_API_URL + '/messStaff/scanning?roll_no=' + rollNo.trim(),
+							PUBLIC_API_URL +
+								'/messStaff/scanning?roll_no=' +
+								rollNo.trim() +
+								'&meal=' +
+								messTimeValue,
 							{
 								method: 'GET',
 								credentials: 'include'
@@ -81,7 +84,12 @@
 		</div>
 		<div class="flex gap-x-8">
 			<!-- <CustomSelect value={messValue} items={messSelectItems} /> -->
-			<CustomSelect value={messTimeValue} widthClass="!w-[8rem]" items={messTimeItems} />
+			<CustomSelect
+				name="meal"
+				value={messTimeValue}
+				widthClass="!w-[8rem]"
+				items={messTimeItems}
+			/>
 		</div>
 	</section>
 	<section class="flex flex-col items-center pl-56">

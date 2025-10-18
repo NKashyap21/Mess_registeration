@@ -254,6 +254,16 @@ func (r *RedisMessService) RemoveFromPendingSync(userID uint) error {
 
 }
 
+func (r *RedisMessService) ClearMessCount() error {
+	pipe := r.client.Pipeline()
+
+	for i := range 5 {
+		pipe.Set(r.ctx, fmt.Sprintf(MESS_COUNTER_KEY, i), 0, 0)
+	}
+	_, err := pipe.Exec(r.ctx)
+	return err
+}
+
 // ClearUserRegistration removes a user's mess assignment (for rollback scenarios)
 func (r *RedisMessService) ClearUserRegistration(userID uint, messID int) error {
 	counterKey := fmt.Sprintf(MESS_COUNTER_KEY, messID)

@@ -217,7 +217,7 @@ func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	}
 
 	// Step 4: Copy next_mess → mess
-	if err := tx.Exec(`UPDATE users SET mess = next_mess WHERE next_mess IS NOT NULL`).Error; err != nil {
+	if err := tx.Exec(`UPDATE users SET mess = next_mess WHERE next_mess IS NOT NULL and can_register`).Error; err != nil {
 		tx.Rollback()
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to copy next_mess to mess")
 		return
@@ -234,6 +234,11 @@ func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	if err := tx.Commit().Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to commit transaction")
 		return
+	}
+
+	if err := oc.redisService.ClearMessCount(); err != nil {
+		log.Println("Failed to clear redis mess counts")
+		log.Println(err)
 	}
 
 	// Step 7: Return updated registration details

@@ -5,16 +5,18 @@
 	import { colorScheme } from '$lib/state/dark.svelte';
 	let {
 		value = $bindable(''),
+		name,
 		items,
 		widthClass
 	}: {
 		value: string;
+		name?: string;
 		items: { label: string; value: string }[];
 		widthClass?: ClassValue;
 	} = $props();
 </script>
 
-<Select.Root type="single" bind:value {items}>
+<Select.Root {name} type="single" bind:value {items}>
 	<Select.Trigger
 		class="flex {widthClass} {colorScheme.dark
 			? 'dark'

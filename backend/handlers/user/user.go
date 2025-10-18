@@ -28,6 +28,8 @@ func (u *UserController) GetUserInfoHandler(c *gin.Context) {
 		mess_name = "Mess B LDH"
 	case 4:
 		mess_name = "Mess B UDH"
+	case 5:
+		mess_name = "Veg Mess"
 	default:
 		mess_name = "No mess assigned"
 	}
