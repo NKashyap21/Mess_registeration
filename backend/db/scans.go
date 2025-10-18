@@ -18,7 +18,9 @@ type Scans struct {
 
 // LogCurrentMeal logs a scan for the user based on the current time
 func LogCurrentMeal(db *gorm.DB, userID uint, messID uint) (*Scans, error) {
-	now := time.Now()
+
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	now := time.Now().In(istLocation)
 	meal := 0
 
 	switch {

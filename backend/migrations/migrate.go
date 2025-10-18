@@ -16,6 +16,7 @@ func MigrateDB() error {
 		&db.LoggerDetails{}, // Add logs table
 		&db.MessRegistrationDetails{},
 		&db.SwapRequest{},
+		&db.Scans{},
 	)
 
 	if err != nil {

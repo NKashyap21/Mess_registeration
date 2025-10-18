@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LambdaIITH/mess_registration/config"
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -133,6 +134,19 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	// Determine the TTL based on the current time
 	istLocation := time.FixedZone("IST", 5*60*60+30*60)
 	currentTime := time.Now().In(istLocation)
+
+	// Log scan in DB
+	scan, err := db.LogCurrentMeal(sc.DB, user.ID, uint(user.Mess))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to log scan in DB: "+err.Error())
+		return
+	}
+	if scan == nil {
+		utils.RespondWithJSON(c, http.StatusBadRequest, models.APIResponse{
+			Message: "Not a valid meal time",
+		})
+		return
+	}
 
 	var ttl time.Duration
 	if currentTime.Hour() == 17 { // 5-6 PM IST (snacks time)
