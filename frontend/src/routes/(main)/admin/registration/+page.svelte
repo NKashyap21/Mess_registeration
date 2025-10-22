@@ -97,7 +97,9 @@
 			>
 				<div class="flex flex-col gap-y-8 px-8 py-6">
 					<div class="text-xl text-nowrap">
-						Are you sure you want to start regular registration?
+						Are you sure you want to {data.status['registration_status']['normal']
+							? 'Stop'
+							: 'Start'} regular registration?
 					</div>
 					<div class="ml-auto flex gap-x-4 self-end">
 						<Button
@@ -128,7 +130,10 @@
 				buttonText="{data.status['registration_status']['veg'] ? 'Stop' : 'Start'} Veg Registration"
 			>
 				<div class="flex flex-col gap-y-8 px-8 py-6">
-					<div class="text-xl text-nowrap">Are you sure you want to start veg registration?</div>
+					<div class="text-xl text-nowrap">
+						Are you sure you want to {data.status['registration_status']['veg'] ? 'Stop' : 'Start'} veg
+						registration?
+					</div>
 					<div class="ml-auto flex gap-x-4 self-end">
 						<Button
 							class=""

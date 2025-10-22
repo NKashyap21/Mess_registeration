@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/favicon.png';
 	import Header from '$lib/components/common/Header.svelte';
 	import { colorScheme } from '$lib/state/dark.svelte';
 
@@ -20,5 +20,5 @@
 	<main class="flex h-full w-full grow flex-col items-center justify-center **:transition-colors">
 		{@render children?.()}
 	</main>
-	<div class="mb-10 self-center text-custom-light-grey">Brought to you with 🧡💜🧡 by Lambda</div>
+	<div class="mb-10 self-center text-custom-light-grey">Brought to you with 💜 by Lambda</div>
 </div>
