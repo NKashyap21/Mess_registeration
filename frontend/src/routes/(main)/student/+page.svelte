@@ -11,17 +11,22 @@
 <MainPanelHeader>Mess Portal</MainPanelHeader>
 
 <section
-	class="grid grid-cols-2 gap-x-8 gap-y-14 px-24 pt-24 pb-6 text-3xl leading-none font-medium text-custom-black dark:text-custom-off-white"
+	class="grid grid-cols-1 gap-y-2 px-6 pt-8 pb-10 text-lg font-medium text-custom-black *:even:mb-4 sm:text-xl md:px-10 lg:grid-cols-2 lg:gap-x-4 lg:gap-y-10 lg:px-12 lg:pt-12 lg:pb-6 lg:text-2xl 2xl:gap-x-8 2xl:gap-y-14 2xl:px-24 2xl:pt-24 2xl:text-3xl dark:text-custom-off-white"
 >
-	<p>Current Registered Mess :</p>
-	<p>
+	<!-- Current Mess -->
+	<p class="text-gray-700 dark:text-custom-off-white">Current Registered Mess :</p>
+	<p class="text-gray-900 dark:text-custom-off-white">
 		{data.user.mess_id ?? 'Unknown'}
 	</p>
-	<p>Next Registration :</p>
+
+	<!-- Next Registration -->
+	<p class="text-gray-700 dark:text-custom-off-white">Next Registration :</p>
 	<p>
-		{data.userMessData?.next_mess_name ?? 'Unknown'}<br />
+		{data.userMessData?.next_mess_name ?? 'Unknown'}
 		{#if data.userMessData.status == 'pending_sync'}
-			<span class="mt-3 block text-2xl">
+			<span
+				class="mt-2 block text-base text-gray-500 sm:text-lg md:text-xl 2xl:text-2xl dark:text-gray-300"
+			>
 				Pending assignment to {data.userMessData.mess == 1
 					? 'Mess A (LDH)'
 					: data.userMessData.mess == 2
@@ -36,7 +41,9 @@
 			</span>
 		{/if}
 	</p>
-	<p>Registration Status :</p>
+
+	<!-- Registration Status -->
+	<p class="text-gray-700 dark:text-custom-off-white">Registration Status :</p>
 	<p>
 		{data.regData.regular && data.regData.veg
 			? 'Regular and Veg Registration Active Now'
@@ -47,35 +54,33 @@
 					: 'Inactive'}
 	</p>
 
-	<div class="col-span-2 mx-auto mt-16 flex gap-x-8">
+	<!-- Buttons -->
+	<div
+		class="col-span-1 mt-6 flex flex-col gap-y-4 sm:flex-row sm:justify-center sm:gap-x-4 md:col-span-2 md:mt-8 lg:mx-auto lg:mt-6 lg:flex-row lg:gap-x-6 2xl:mt-16 2xl:gap-x-8"
+	>
 		{#if !registered}
 			{#if data.regData.regular}
 				<Button
 					disabled={data.userMessData.status == 'pending_sync' ||
 						(data.userMessData.status == 'confirmed' && registered)}
-					onclick={() => {
-						goto('student/register?veg=false');
-					}}
-					class="">Go for Regular Registration</Button
+					onclick={() => goto('student/register?veg=false')}
+					class="w-full sm:w-auto"
 				>
+					Go for Regular Registration
+				</Button>
 			{/if}
 			{#if data.regData.veg}
 				<Button
 					disabled={data.userMessData.status == 'pending_sync' ||
 						(data.userMessData.status == 'confirmed' && registered)}
-					onclick={() => {
-						goto('student/register?veg=true');
-					}}
-					class="">Go for Veg Registration</Button
+					onclick={() => goto('student/register?veg=true')}
+					class="w-full sm:w-auto"
 				>
+					Go for Veg Registration
+				</Button>
 			{/if}
 			{#if data.userMessData.current_mess != 0 && (data.userMessData?.current_mess ?? 5) != 5}
-				<Button
-					onclick={() => {
-						goto('student/swap');
-					}}
-					class="">Swap Mess</Button
-				>
+				<Button onclick={() => goto('student/swap')} class="w-full sm:w-auto">Swap Mess</Button>
 			{/if}
 		{/if}
 	</div>

@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="rounded-xl bg-[#f8f8f8] p-12 shadow-md {page.url.pathname.includes('admin')
+	class="rounded-xl bg-[#f8f8f8] p-8 shadow-md 2xl:p-12 {page.url.pathname.includes('admin')
 		? 'min-w-3/4 rounded-tl-none'
 		: ''} dark:bg-custom-dark-grey dark:text-white"
 >
