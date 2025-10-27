@@ -13,7 +13,7 @@
 	let { userData }: { userData: any } = $props();
 </script>
 
-<header class="flex w-full items-center px-6 pt-4 lg:px-10 2xl:px-16 2xl:pt-6">
+<header class="flex w-full items-center px-6 pt-4 lg:px-10 lg:pt-8 2xl:px-16 2xl:pt-6">
 	<img src={iithLogoDark} class="w-10 lg:w-16 dark:hidden" alt="iith logo" />
 	<img src={iithLogoLight} class="hidden w-10 lg:w-16 dark:block" alt="iith logo" />
 	<div class="ml-auto flex flex-row items-center gap-x-4 lg:gap-x-8">
