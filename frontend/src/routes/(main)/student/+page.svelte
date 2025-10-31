@@ -56,7 +56,7 @@
 
 	<!-- Buttons -->
 	<div
-		class="col-span-1 mt-6 flex flex-col gap-y-4 sm:flex-row sm:justify-center sm:gap-x-4 md:col-span-2 md:mt-8 lg:mx-auto lg:mt-6 lg:flex-row lg:gap-x-6 2xl:mt-16 2xl:gap-x-8"
+		class="col-span-1 mt-6 flex flex-col gap-y-4 sm:flex-row sm:justify-center sm:gap-x-4 md:col-span-2 md:mt-8 lg:mx-auto lg:mt-1 lg:flex-row lg:gap-x-6 2xl:mt-8 2xl:gap-x-8"
 	>
 		{#if !registered}
 			{#if data.regData.regular}
