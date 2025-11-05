@@ -89,5 +89,19 @@ func SetupRouter() *gin.Engine {
 	hostelOffice.POST("/apply-new-registration", officeController.ApplyNewRegistration)
 	hostelOffice.POST("/add-user", officeController.AddNewUser)
 
+	// CSV upload/download endpoints
+	hostelOffice.POST("/students/upload-csv", officeController.UploadStudentsCSV)
+	hostelOffice.POST("/students/update-can-register-csv", officeController.UpdateCanRegisterCSV)
+	hostelOffice.PUT("/students/bulk-edit", officeController.BulkEditStudents)
+	hostelOffice.GET("/students/download-csv", officeController.DownloadStudentsCSV)
+	hostelOffice.GET("/registrations/download-csv", officeController.DownloadRegistrationsCSV)
+	hostelOffice.GET("/scans/download-csv", officeController.DownloadScansCSV)
+
+	// Archive endpoints
+	hostelOffice.POST("/archive/cycle", officeController.ArchiveCycle)
+	hostelOffice.GET("/archive/list", officeController.ListArchivedTables)
+	hostelOffice.GET("/archive/students/download-csv", officeController.DownloadArchivedStudentsCSV)
+	hostelOffice.GET("/archive/scans/download-csv", officeController.DownloadArchivedScansCSV)
+
 	return r
 }

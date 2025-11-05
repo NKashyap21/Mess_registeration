@@ -1,0 +1,3 @@
+UserID,UserName,RollNo,Email,CurrentMess,RegisteredMess,UpdatedAt
+1,John Doe,CS21B001,john.doe@students.iith.ac.in,1,2,2025-10-20T14:22:00Z
+2,Jane Smith,CS21B002,jane.smith@students.iith.ac.in,2,1,2025-10-20T14:23:00Z

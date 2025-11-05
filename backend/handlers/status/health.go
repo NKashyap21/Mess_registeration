@@ -3,6 +3,8 @@ package status
 import (
 	"net/http"
 
+	"github.com/LambdaIITH/mess_registration/models"
+	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,13 +15,11 @@ func InitHealthController() *HealthController {
 }
 
 func (hc *HealthController) CheckHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Server is running",
-		"data": gin.H{
+	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
+		Message: "Server is running",
+		Data: map[string]interface{}{
 			"status":  "healthy",
 			"version": "1.0.0",
 		},
 	})
 }
-

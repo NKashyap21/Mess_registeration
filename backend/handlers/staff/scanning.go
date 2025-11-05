@@ -14,24 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func (sc *ScanningController) GetStaffInfo(c *gin.Context) {
-	// Get the authenticated mess staff user from context
-	staffUser, exists := c.Get("user")
-	if !exists {
-		utils.RespondWithJSON(c, http.StatusUnauthorized, models.APIResponse{
-			Message: "Authentication required",
-		})
-		return
-	}
-
-	staff := staffUser.(models.User)
-
-	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
-		Message: "Staff information retrieved successfully",
-		Data:    gin.H{"staff": staff},
-	})
-}
-
 func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	// Get the authenticated mess staff user from context
 	staffUser, exists := c.Get("user")
@@ -70,7 +52,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	if user.Mess == 0 {
 		utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 			Message: "User does not have a mess assigned",
-			Data:    gin.H{"user": user},
+			Data:    map[string]interface{}{"user": user},
 		})
 		return
 	}
@@ -91,7 +73,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		if !utils.Contains(allowedMesses, user.Mess) {
 			utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 				Message: "User does not have access to Mess A",
-				Data:    gin.H{"user": user},
+				Data:    map[string]interface{}{"user": user},
 			})
 			return
 		}
@@ -100,7 +82,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		if !utils.Contains(allowedMesses, user.Mess) {
 			utils.RespondWithJSON(c, http.StatusForbidden, models.APIResponse{
 				Message: "User does not have access to Mess B",
-				Data:    gin.H{"user": user},
+				Data:    map[string]interface{}{"user": user},
 			})
 			return
 		}
@@ -126,7 +108,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	if existsCount > 0 {
 		utils.RespondWithJSON(c, http.StatusConflict, models.APIResponse{
 			Message: "User has already scanned their ID card",
-			Data:    gin.H{"user": user, "already_scanned": true},
+			Data:    map[string]interface{}{"user": user, "already_scanned": true},
 		})
 		return
 	}
@@ -167,6 +149,6 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	// If all checks pass and scan is stored successfully, respond with user details
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 		Message: "User verified and scan recorded successfully",
-		Data:    gin.H{"user": user, "staff": staff.Name, "scan_recorded": true},
+		Data:    map[string]interface{}{"user": user, "staff": staff.Name, "scan_recorded": true},
 	})
 }

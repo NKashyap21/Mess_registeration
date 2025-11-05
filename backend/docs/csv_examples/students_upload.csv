@@ -1,0 +1,11 @@
+Name,Email,Phone,RollNo,Mess,Type,CanRegister
+John Doe,john.doe@students.iith.ac.in,9876543210,CS21B001,1,0,true
+Jane Smith,jane.smith@students.iith.ac.in,9876543211,CS21B002,2,0,true
+Alice Johnson,alice.j@students.iith.ac.in,9876543212,CS21B003,0,0,true
+Bob Williams,bob.w@students.iith.ac.in,9876543213,CS21B004,3,0,false
+Charlie Brown,charlie.b@students.iith.ac.in,9876543214,CS21B005,4,0,true
+David Lee,david.lee@students.iith.ac.in,9876543215,CS21B006,5,0,true
+Eva Martinez,eva.m@students.iith.ac.in,9876543216,CS21B007,1,0,true
+Mess Staff One,staff1@mess.iith.ac.in,9876543217,STAFF001,0,1,false
+Mess Staff Two,staff2@mess.iith.ac.in,9876543218,STAFF002,0,1,false
+Office Admin,admin@office.iith.ac.in,9876543219,OFFICE001,0,2,false

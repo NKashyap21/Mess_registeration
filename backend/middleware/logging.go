@@ -3,10 +3,13 @@ package middleware
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/services"
+	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,10 +23,8 @@ func Logger() gin.HandlerFunc {
 			log.Printf("panic recovered: %s", err)
 			logger.LogSystemAction("PANIC_RECOVERY", fmt.Sprintf("Panic recovered: %s", err))
 		}
-		c.JSON(500, gin.H{
-			"success": false,
-			"message": "Internal server error",
-			"error":   "Something went wrong",
+		utils.RespondWithJSON(c, http.StatusInternalServerError, models.APIResponse{
+			Message: "Internal server error",
 		})
 	})
 }
@@ -143,10 +144,8 @@ func Recovery() gin.HandlerFunc {
 			log.Printf("panic recovered: %v", recovered)
 			logger.LogSystemAction("PANIC_RECOVERY", fmt.Sprintf("Panic recovered at %s %s: %v", c.Request.Method, c.Request.URL.Path, recovered))
 		}
-		c.JSON(500, gin.H{
-			"success": false,
-			"message": "Internal server error",
-			"error":   "Something went wrong",
+		utils.RespondWithJSON(c, http.StatusInternalServerError, models.APIResponse{
+			Message: "Internal server error",
 		})
 	})
 }

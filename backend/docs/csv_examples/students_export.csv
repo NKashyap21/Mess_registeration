@@ -1,0 +1,11 @@
+ID,Name,Email,Phone,RollNo,Mess,NextMess,Type,CanRegister,CreatedAt,UpdatedAt
+1,John Doe,john.doe@students.iith.ac.in,9876543210,CS21B001,1,2,0,true,2025-01-15T10:30:00Z,2025-10-20T14:22:00Z
+2,Jane Smith,jane.smith@students.iith.ac.in,9876543211,CS21B002,2,1,0,true,2025-01-15T10:31:00Z,2025-10-20T14:23:00Z
+3,Alice Johnson,alice.j@students.iith.ac.in,9876543212,CS21B003,3,3,0,true,2025-01-15T10:32:00Z,2025-10-20T14:24:00Z
+4,Bob Williams,bob.w@students.iith.ac.in,9876543213,CS21B004,4,4,0,false,2025-01-15T10:33:00Z,2025-10-20T14:25:00Z
+5,Charlie Brown,charlie.b@students.iith.ac.in,9876543214,CS21B005,1,5,0,true,2025-01-15T10:34:00Z,2025-10-20T14:26:00Z
+6,David Lee,david.lee@students.iith.ac.in,9876543215,CS21B006,5,1,0,true,2025-01-15T10:35:00Z,2025-10-20T14:27:00Z
+7,Eva Martinez,eva.m@students.iith.ac.in,9876543216,CS21B007,2,2,0,true,2025-01-15T10:36:00Z,2025-10-20T14:28:00Z
+8,Mess Staff One,staff1@mess.iith.ac.in,9876543217,STAFF001,0,0,1,false,2025-01-15T10:37:00Z,2025-01-15T10:37:00Z
+9,Mess Staff Two,staff2@mess.iith.ac.in,9876543218,STAFF002,0,0,1,false,2025-01-15T10:38:00Z,2025-01-15T10:38:00Z
+10,Office Admin,admin@office.iith.ac.in,9876543219,OFFICE001,0,0,2,false,2025-01-15T10:39:00Z,2025-01-15T10:39:00Z

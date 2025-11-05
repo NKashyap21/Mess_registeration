@@ -17,20 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TODO: state param for csrf
-func (a *AuthController) GoogleLoginRedirect(c *gin.Context) {
-	// Handle mobile POST request with ID token
-	if c.Request.Method == "POST" {
-		a.handleMobileLogin(c)
-		return
-	}
-
-	// Original GET request for web OAuth redirect
-	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
-		Message: "Redirect Url",
-		Data:    gin.H{"redirect": fmt.Sprintf("https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=%s&scope=openid%%20profile%%20email&redirect_uri=%s", os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("BACKEND_URL")+"/api/login-code")},
-	})
-}
 
 func (a *AuthController) handleMobileLogin(c *gin.Context) {
 	logger := services.GetLoggerService()
@@ -97,18 +83,7 @@ func (a *AuthController) handleMobileLogin(c *gin.Context) {
 
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
 		Message: "Login successful",
-		Data:    gin.H{"token": tokenString, "user": user},
-	})
-}
-
-func (a *AuthController) Logout(c *gin.Context) {
-	// Clear the JWT cookie for web clients
-	c.SetCookie("jwt", "", -1, "/", strings.Split(os.Getenv("FRONTEND_URL"), ":")[1][2:], false, true)
-
-	// Return JSON response for mobile clients
-	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
-		Message: "Logout successful",
-		Data:    nil,
+		Data:    map[string]interface{}{"token": tokenString, "user": user},
 	})
 }
 
