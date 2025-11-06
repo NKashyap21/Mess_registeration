@@ -17,7 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func (a *AuthController) handleMobileLogin(c *gin.Context) {
 	logger := services.GetLoggerService()
 

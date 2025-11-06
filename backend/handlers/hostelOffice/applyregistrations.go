@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	// Step 1: Ensure at least one row exists
 	var reg models.MessRegistrationDetails

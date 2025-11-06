@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func (oc *OfficeController) GetRegistrationStatus(c *gin.Context) {
 	var details models.MessRegistrationDetails
 
