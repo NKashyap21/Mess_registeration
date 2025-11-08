@@ -44,5 +44,5 @@
 		"bits-ui": "^2.11.0",
 		"google-auth-library": "^10.4.0"
 	},
-	"packageManager": "pnpm@10.18.3"
+	"packageManager": "pnpm@10.20.0"
 }

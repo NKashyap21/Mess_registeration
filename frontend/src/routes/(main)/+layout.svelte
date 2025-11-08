@@ -13,7 +13,7 @@
 >
 	{#if page.url.pathname.includes('admin')}
 		<div class="relative">
-			<div class="absolute -top-12 -left-12 flex -translate-y-full gap-x-4">
+			<div class="absolute -top-8 -left-8 flex -translate-y-full gap-x-4 2xl:-top-12 2xl:-left-12">
 				<NavTabs
 					onclick={() => {
 						goto('/admin/registration');

@@ -8,6 +8,8 @@
 	let vegConfirm = $state(false);
 	let regConfirm = $state(false);
 	let applyConfirm = $state(false);
+
+	console.log(data);
 </script>
 
 <section class="flex flex-col">
@@ -18,11 +20,11 @@
 				<div class="text-xl font-semibold">Current Stats</div>
 				<div class="flex flex-col">
 					<div class="flex flex-col gap-y-6">
-						{#each Object.keys(data.status['current_mess']) as messName}
+						{#each Object.keys(data.status.data['current_mess']) as messName}
 							<section class="flex flex-row">
 								<h2 class=" min-w-[6rem] text-xl font-bold">{messName}</h2>
 								<div class="flex flex-col gap-y-2">
-									{#each Object.keys(data.status['current_mess'][messName]) as hall, idx}
+									{#each Object.keys(data.status.data['current_mess'][messName]) as hall, idx}
 										<div class="flex items-center">
 											<h3 class="w-[8rem] text-xl">{hall}</h3>
 											<Progress
@@ -30,13 +32,13 @@
 												innerClass={idx % 2 == 0
 													? 'bg-[#919191] dark:bg-[#B4B4B4]'
 													: 'bg-custom-light-orange'}
-												value={(data.status['current_mess'][messName][hall] * 100) /
-													data.status['capacity'][messName][hall]}
+												value={(data.status.data['current_mess'][messName][hall] * 100) /
+													data.status.data['capacity'][messName][hall]}
 											/>
 											<h3 class="px-6 text-xl font-medium">
-												{data.status['current_mess'][messName][hall]}/{data.status['capacity'][
-													messName
-												][hall]}
+												{data.status.data['current_mess'][messName][hall]}/{data.status.data[
+													'capacity'
+												][messName][hall]}
 											</h3>
 										</div>
 									{/each}
@@ -51,11 +53,11 @@
 				<div class="text-xl font-semibold">Upcoming Stats</div>
 				<div class="flex flex-col">
 					<div class="flex flex-col gap-y-6">
-						{#each Object.keys(data.status['upcoming_mess']) as messName}
+						{#each Object.keys(data.status.data['upcoming_mess']) as messName}
 							<section class="flex flex-row">
 								<h2 class="w-[6rem] text-xl font-bold">{messName}</h2>
 								<div class="flex flex-col gap-y-2">
-									{#each Object.keys(data.status['upcoming_mess'][messName]) as hall, idx}
+									{#each Object.keys(data.status.data['upcoming_mess'][messName]) as hall, idx}
 										<div class="flex items-center">
 											<h3 class="w-[8rem] text-xl">{hall}</h3>
 											<Progress
@@ -63,13 +65,13 @@
 												innerClass={idx % 2 == 0
 													? 'bg-[#919191] dark:bg-[#B4B4B4]'
 													: 'bg-custom-light-orange'}
-												value={(data.status['upcoming_mess'][messName][hall] * 100) /
-													data.status['capacity'][messName][hall]}
+												value={(data.status.data['upcoming_mess'][messName][hall] * 100) /
+													data.status.data['capacity'][messName][hall]}
 											/>
 											<h3 class="px-6 text-xl font-medium">
-												{data.status['upcoming_mess'][messName][hall]}/{data.status['capacity'][
-													messName
-												][hall]}
+												{data.status.data['upcoming_mess'][messName][hall]}/{data.status.data[
+													'capacity'
+												][messName][hall]}
 											</h3>
 										</div>
 									{/each}
@@ -90,14 +92,14 @@
 			<Button>Import New List</Button>
 			<Modal
 				bind:open={regConfirm}
-				buttonText="{data.status['registration_status']['normal']
+				buttonText="{data.status.data['registration_status']['normal']
 					? 'Stop'
 					: 'Start'} Regular Registration"
 				class=""
 			>
 				<div class="flex flex-col gap-y-8 px-8 py-6">
 					<div class="text-xl text-nowrap">
-						Are you sure you want to {data.status['registration_status']['normal']
+						Are you sure you want to {data.status.data['registration_status']['normal']
 							? 'Stop'
 							: 'Start'} regular registration?
 					</div>
@@ -127,12 +129,15 @@
 			</Modal>
 			<Modal
 				bind:open={vegConfirm}
-				buttonText="{data.status['registration_status']['veg'] ? 'Stop' : 'Start'} Veg Registration"
+				buttonText="{data.status.data['registration_status']['veg']
+					? 'Stop'
+					: 'Start'} Veg Registration"
 			>
 				<div class="flex flex-col gap-y-8 px-8 py-6">
 					<div class="text-xl text-nowrap">
-						Are you sure you want to {data.status['registration_status']['veg'] ? 'Stop' : 'Start'} veg
-						registration?
+						Are you sure you want to {data.status.data['registration_status']['veg']
+							? 'Stop'
+							: 'Start'} veg registration?
 					</div>
 					<div class="ml-auto flex gap-x-4 self-end">
 						<Button
