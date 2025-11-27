@@ -2,14 +2,17 @@ import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { PRIVATE_API_URL } from '$env/static/private';
 
-export const load: PageServerLoad = async ({ parent, fetch }) => {
+export const load: PageServerLoad = async ({ parent, fetch, url }) => {
 	const data = await parent();
-	if (data.userMessData.status == 'pending_sync' || (data.userMessData?.next_mess ?? 1) != 0) {
+	if (
+		data.userMessData?.data?.status == 'pending_sync' ||
+		(data.userMessData?.data?.next_mess ?? 1) != 0
+	) {
 		throw redirect(307, '/');
 	}
 	return {
 		messStats: await (
-			await fetch(PRIVATE_API_URL + '/students/messStatsGrouped', {
+			await fetch(PRIVATE_API_URL + '/students/messStatsGrouped' + url.search, {
 				method: 'GET',
 				credentials: 'include'
 			})

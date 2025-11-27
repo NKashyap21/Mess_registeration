@@ -59,7 +59,7 @@ func (oc *OfficeController) ApplyNewRegistration(c *gin.Context) {
 	}
 
 	// Step 5: Reset next_mess to 0 (or NULL if preferred)
-	if err := tx.Model(&models.User{}).Updates(map[string]interface{}{"next_mess": 0}).Error; err != nil {
+	if err := tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&models.User{}).Updates(map[string]interface{}{"next_mess": 0}).Error; err != nil {
 		tx.Rollback()
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to reset next_mess")
 		return

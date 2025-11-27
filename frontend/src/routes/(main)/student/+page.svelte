@@ -4,7 +4,7 @@
 	import MainPanelHeader from '$lib/components/common/MainPanelHeader.svelte';
 
 	let { data } = $props();
-	let registered = $state(data.userMessData.next_mess != 0);
+	let registered = $state(data.userMessData.data.next_mess != 0);
 	console.log(data);
 </script>
 
@@ -22,20 +22,20 @@
 	<!-- Next Registration -->
 	<p class="text-gray-700 dark:text-custom-off-white">Next Registration :</p>
 	<p>
-		{data.userMessData?.next_mess_name ?? 'Unknown'}
-		{#if data.userMessData.status == 'pending_sync'}
+		{data.userMessData?.data.next_mess_name ?? 'Unknown'}
+		{#if data.userMessData.data.status == 'pending_sync'}
 			<span
 				class="mt-2 block text-base text-gray-500 sm:text-lg md:text-xl 2xl:text-2xl dark:text-gray-300"
 			>
-				Pending assignment to {data.userMessData.mess == 1
+				Pending assignment to {data.userMessData.data.mess == 1
 					? 'Mess A (LDH)'
-					: data.userMessData.mess == 2
+					: data.userMessData.data.mess == 2
 						? 'Mess A (UDH)'
-						: data.userMessData.mess == 3
+						: data.userMessData.data.mess == 3
 							? 'Mess B (LDH)'
-							: data.userMessData.mess == 4
+							: data.userMessData.data.mess == 4
 								? 'Mess B (UDH)'
-								: data.userMessData.mess == 5
+								: data.userMessData.data.mess == 5
 									? 'Veg Mess'
 									: 'Unknown'}
 			</span>
@@ -61,9 +61,9 @@
 		{#if !registered}
 			{#if data.regData.regular}
 				<Button
-					disabled={data.userMessData.status == 'pending_sync' ||
-						(data.userMessData.status == 'confirmed' && registered)}
-					onclick={() => goto('student/register?veg=false')}
+					disabled={data.userMessData.data.status == 'pending_sync' ||
+						(data.userMessData.data.status == 'confirmed' && registered)}
+					onclick={() => goto('/student/register?veg=false')}
 					class="w-full sm:w-auto"
 				>
 					Go for Regular Registration
@@ -71,16 +71,16 @@
 			{/if}
 			{#if data.regData.veg}
 				<Button
-					disabled={data.userMessData.status == 'pending_sync' ||
-						(data.userMessData.status == 'confirmed' && registered)}
-					onclick={() => goto('student/register?veg=true')}
+					disabled={data.userMessData.data.status == 'pending_sync' ||
+						(data.userMessData.data.status == 'confirmed' && registered)}
+					onclick={() => goto('/student/register?veg=true')}
 					class="w-full sm:w-auto"
 				>
 					Go for Veg Registration
 				</Button>
 			{/if}
-			{#if data.userMessData.current_mess != 0 && (data.userMessData?.current_mess ?? 5) != 5}
-				<Button onclick={() => goto('student/swap')} class="w-full sm:w-auto">Swap Mess</Button>
+			{#if data.userMessData.data.current_mess != 0 && (data.userMessData?.data.current_mess ?? 5) != 5}
+				<Button onclick={() => goto('/student/swap')} class="w-full sm:w-auto">Swap Mess</Button>
 			{/if}
 		{/if}
 	</div>
