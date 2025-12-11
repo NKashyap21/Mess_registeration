@@ -35,6 +35,22 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		return
 	}
 
+	mealName := c.Query("meal")
+	if mealName == "" {
+		utils.RespondWithJSON(c, http.StatusBadRequest, models.APIResponse{
+			Message: "No meal selected",
+		})
+		return
+	}
+
+	if !(mealName == "Breakfast" || mealName == "Lunch" || mealName == "Dinner" || mealName == "Snack") {
+		utils.RespondWithJSON(c, http.StatusBadRequest, models.APIResponse{
+			Message: "Invalid meal selected",
+		})
+		return
+
+	}
+
 	// Fetch user details from the database
 	var user models.User
 	if err := sc.DB.Where("roll_no = ?", rollNo).First(&user).Error; err != nil {
@@ -93,10 +109,14 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		return
 	}
 
+	// Determine the current time based on the IST
+	istLocation := time.FixedZone("IST", 5*60*60+30*60)
+	currentTime := time.Now().In(istLocation)
+
 	// Check if user has already scanned (check Redis)
 	ctx := context.Background()
 	redisClient := config.GetRedisClient()
-	scanKey := fmt.Sprintf("scan:%s", rollNo)
+	scanKey := fmt.Sprintf("scan:%s:%s:%s", mealName, rollNo, currentTime.Format("2006-01-02"))
 
 	// Check if user has already scanned for this meal
 	existsCount, err := redisClient.Exists(ctx, scanKey).Result()
@@ -113,10 +133,6 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		return
 	}
 
-	// Determine the TTL based on the current time
-	istLocation := time.FixedZone("IST", 5*60*60+30*60)
-	currentTime := time.Now().In(istLocation)
-
 	// Log scan in DB
 	scan, err := db.LogCurrentMeal(sc.DB, user.ID, uint(user.Mess))
 	if err != nil {
@@ -130,12 +146,8 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 		return
 	}
 
-	var ttl time.Duration
-	if currentTime.Hour() == 17 { // 5-6 PM IST (snacks time)
-		ttl = 1 * time.Hour
-	} else {
-		ttl = 150 * time.Minute
-	}
+	// TTL for clearing the resource ( storage optimizing )
+	ttl := 32 * time.Hour
 
 	// Store the scan in Redis with the determined TTL
 	scanData := fmt.Sprintf("scanned_by:%s_at:%d", staff.Name, time.Now().Unix())

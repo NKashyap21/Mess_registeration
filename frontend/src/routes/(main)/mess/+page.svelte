@@ -7,7 +7,20 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { Dialog } from 'bits-ui';
 	import { PUBLIC_API_URL } from '$env/static/public';
-	let messTimeValue = $state('Time');
+	let messTimeValue = $state(
+		(() => {
+			let currentHour = new Date(new Date()).getHours();
+			if (currentHour <= 10) {
+				return 'Breakfast';
+			} else if (currentHour <= 15) {
+				return 'Lunch';
+			} else if (currentHour <= 19) {
+				return 'Snack';
+			} else {
+				return 'Dinner';
+			}
+		})()
+	);
 	// const messSelectItems = [
 	// 	{ label: 'Mess A', value: 'Mess A' },
 	// 	{ label: 'Mess B', value: 'Mess B' }
@@ -86,7 +99,7 @@
 			<!-- <CustomSelect value={messValue} items={messSelectItems} /> -->
 			<CustomSelect
 				name="meal"
-				value={messTimeValue}
+				bind:value={messTimeValue}
 				widthClass="!w-[8rem]"
 				items={messTimeItems}
 			/>
