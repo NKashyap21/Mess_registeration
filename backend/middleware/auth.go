@@ -25,7 +25,7 @@ func TokenRequired(db *gorm.DB, c *gin.Context) gin.HandlerFunc {
 
 		if tokenString == "" {
 			var err error
-			tokenString, err = c.Cookie("jwt")
+			tokenString, err = c.Cookie("mess_jwt")
 			if err != nil && err != http.ErrNoCookie {
 				utils.RespondWithError(c, http.StatusBadRequest, "Failed to retrieve token")
 				return

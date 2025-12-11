@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { PRIVATE_API_URL } from '$env/static/private';
+import { resolve } from '$app/paths';
 
 export const load: PageServerLoad = async ({ parent, fetch, url }) => {
 	const data = await parent();
@@ -8,7 +9,7 @@ export const load: PageServerLoad = async ({ parent, fetch, url }) => {
 		data.userMessData?.data?.status == 'pending_sync' ||
 		(data.userMessData?.data?.next_mess ?? 1) != 0
 	) {
-		throw redirect(307, '/');
+		throw redirect(307, resolve('/'));
 	}
 	return {
 		messStats: await (

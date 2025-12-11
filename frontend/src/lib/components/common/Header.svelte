@@ -34,13 +34,13 @@
 					<Avatar.Root
 						class="size-10 rounded-full hover:scale-105 hover:cursor-pointer active:brightness-95 lg:size-16"
 					>
-						<Avatar.Image class="rounded-full" src={userData.profile_pic} alt="Avatar" />
+						<Avatar.Image class="rounded-full" src={userData?.profile_pic} alt="Avatar" />
 						<Avatar.Fallback>IH</Avatar.Fallback>
 					</Avatar.Root>
 				{/snippet}
 				{#snippet content()}
 					<Avatar.Root class="size-8 rounded-full lg:size-12">
-						<Avatar.Image class="rounded-full" src={userData.profile_pic} alt="Avatar" />
+						<Avatar.Image class="rounded-full" src={userData?.profile_pic} alt="Avatar" />
 						<Avatar.Fallback>IH</Avatar.Fallback>
 					</Avatar.Root>
 					<p class="mt-4 text-base font-medium lg:text-lg">{userData.name}</p>

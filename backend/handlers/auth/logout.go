@@ -12,7 +12,7 @@ import (
 
 func (a *AuthController) Logout(c *gin.Context) {
 	// Clear the JWT cookie for web clients
-	c.SetCookie("jwt", "", -1, "/", strings.Split(os.Getenv("FRONTEND_URL"), ":")[1][2:], false, true)
+	c.SetCookie("mess_jwt", "", -1, "/", strings.Split(os.Getenv("FRONTEND_URL"), "/")[2], false, true)
 
 	// Return JSON response for mobile clients
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{

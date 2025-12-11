@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 # install air
-RUN go install github.com/air-verse/air@latest
+# RUN go install github.com/air-verse/air@latest
 
 # Cache go modules
 COPY go.mod go.sum ./
@@ -24,7 +24,7 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 
-COPY --from=builder /app/.env .
+# COPY --from=builder /app/.env .
 
 EXPOSE 8080
 

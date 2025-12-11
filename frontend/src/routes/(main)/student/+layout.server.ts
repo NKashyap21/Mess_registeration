@@ -1,14 +1,15 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { PRIVATE_API_URL } from '$env/static/private';
+import { resolve } from '$app/paths';
 
 export const load: LayoutServerLoad = async ({ parent, fetch }) => {
 	const par = await parent();
 	if (par.user['user_type'] != 0) {
 		if (par.user['user_type'] == 1) {
-			throw redirect(307, '/mess');
+			throw redirect(307, resolve('/mess'));
 		} else {
-			throw redirect(307, '/admin');
+			throw redirect(307, resolve('/admin'));
 		}
 	}
 	try {

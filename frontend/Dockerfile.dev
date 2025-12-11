@@ -21,10 +21,10 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Copy production files from builder
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/node_modules ./node_modules
 
 # Environment variables
 ENV NODE_ENV=production

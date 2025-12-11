@@ -150,7 +150,7 @@ func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 	// Log successful login
 	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("User %s logged in successfully", email), c.ClientIP())
 
-	c.SetCookie("jwt", tokenString, int(jwtData["exp"].(float64)-jwtData["iat"].(float64)), "/", strings.Split(os.Getenv("FRONTEND_URL"), ":")[1][2:], false, true)
+	c.SetCookie("mess_jwt", tokenString, int(jwtData["exp"].(float64)-jwtData["iat"].(float64)), "/", strings.Split(os.Getenv("FRONTEND_URL"), "/")[2], false, true)
 	c.Redirect(http.StatusTemporaryRedirect, os.Getenv("FRONTEND_URL"))
 
 	// utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import NavTabs from '$lib/components/admin/NavTabs.svelte';
 
@@ -16,37 +17,37 @@
 			<div class="absolute -top-8 -left-8 flex -translate-y-full gap-x-4 2xl:-top-12 2xl:-left-12">
 				<NavTabs
 					onclick={() => {
-						goto('/admin/registration');
+						goto(resolve('/admin/registration'));
 					}}
-					active={page.url.pathname == '/admin/registration'}
+					active={page.url.pathname == resolve('/admin/registration')}
 					text="Registration"
 				/>
 				<NavTabs
 					onclick={() => {
-						goto('/admin/add');
+						goto(resolve('/admin/add'));
 					}}
-					active={page.url.pathname == '/admin/add'}
+					active={page.url.pathname == resolve('/admin/add')}
 					text="Add Registration"
 				/>
 				<NavTabs
 					onclick={() => {
-						goto('/admin/swapping');
+						goto(resolve('/admin/swapping'));
 					}}
-					active={page.url.pathname == '/admin/swapping'}
+					active={page.url.pathname == resolve('/admin/swapping')}
 					text="Swapping"
 				/>
 				<NavTabs
 					onclick={() => {
-						goto('/admin/flags');
+						goto(resolve('/admin/flags'));
 					}}
-					active={page.url.pathname == '/admin/flags'}
+					active={page.url.pathname == resolve('/admin/flags')}
 					text="Flags"
 				/>
 				<NavTabs
 					onclick={() => {
-						goto('/admin/student');
+						goto(resolve('/admin/student'));
 					}}
-					active={page.url.pathname == '/admin/student'}
+					active={page.url.pathname == resolve('/admin/student')}
 					text="Student Search"
 				/>
 			</div>

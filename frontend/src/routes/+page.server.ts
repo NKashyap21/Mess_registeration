@@ -1,18 +1,19 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { PRIVATE_API_URL } from '$env/static/private';
+import { resolve } from '$app/paths';
 
 export const load: PageServerLoad = async ({ fetch, parent }) => {
 	const par = await parent();
 	if (par.user['user_type'] == 0) {
-		throw redirect(307, '/student');
+		throw redirect(307, resolve('/student'));
 	} else if (par.user['user_type'] == 1) {
-		throw redirect(307, '/mess');
+		throw redirect(307, resolve('/mess'));
 	} else if (par.user['user_type'] == 2) {
-		throw redirect(307, '/admin');
+		throw redirect(307, resolve('/admin'));
 	} else {
 		await fetch(PRIVATE_API_URL + '/logout', { method: 'POST', credentials: 'include' });
 		console.error('Failed page server load at /');
-		throw redirect(307, '/login');
+		throw redirect(307, resolve('/login'));
 	}
 };

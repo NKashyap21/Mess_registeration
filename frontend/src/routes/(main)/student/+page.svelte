@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import Button from '$lib/components/common/Button.svelte';
 	import MainPanelHeader from '$lib/components/common/MainPanelHeader.svelte';
 
@@ -63,7 +64,7 @@
 				<Button
 					disabled={data.userMessData.data.status == 'pending_sync' ||
 						(data.userMessData.data.status == 'confirmed' && registered)}
-					onclick={() => goto('/student/register?veg=false')}
+					onclick={() => goto(resolve('/student/register') + '?veg=false')}
 					class="w-full sm:w-auto"
 				>
 					Go for Regular Registration
@@ -73,14 +74,16 @@
 				<Button
 					disabled={data.userMessData.data.status == 'pending_sync' ||
 						(data.userMessData.data.status == 'confirmed' && registered)}
-					onclick={() => goto('/student/register?veg=true')}
+					onclick={() => goto(resolve('/student/register') + '?veg=true')}
 					class="w-full sm:w-auto"
 				>
 					Go for Veg Registration
 				</Button>
 			{/if}
 			{#if data.userMessData.data.current_mess != 0 && (data.userMessData?.data.current_mess ?? 5) != 5}
-				<Button onclick={() => goto('/student/swap')} class="w-full sm:w-auto">Swap Mess</Button>
+				<Button onclick={() => goto(resolve('/student/swap'))} class="w-full sm:w-auto"
+					>Swap Mess</Button
+				>
 			{/if}
 		{/if}
 	</div>
