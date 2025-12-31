@@ -8,8 +8,55 @@
 	let vegConfirm = $state(false);
 	let regConfirm = $state(false);
 	let applyConfirm = $state(false);
+	let downloadOpen = $state(false);
+	let downloadFromDate = $state('');
+	let downloadToDate = $state('');
+	let isDownloading = $state(false);
 
 	console.log(data);
+
+	async function handleDownloadCSV() {
+		if (!downloadFromDate || !downloadToDate) {
+			alert('Please select both from and to dates');
+			return;
+		}
+
+		isDownloading = true;
+		try {
+			const response = await fetch(
+				`${PUBLIC_API_URL}/office/registrations/download-csv?from_date=${downloadFromDate}&to_date=${downloadToDate}`,
+				{
+					method: 'GET',
+					credentials: 'include'
+				}
+			);
+
+			if (!response.ok) {
+				const error = await response.json();
+				alert(error.error ?? 'Failed to download CSV');
+				return;
+			}
+
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `registrations_${downloadFromDate}_to_${downloadToDate}.csv`;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+
+			downloadOpen = false;
+			downloadFromDate = '';
+			downloadToDate = '';
+		} catch (err) {
+			console.error('Download error:', err);
+			alert('Error downloading CSV');
+		} finally {
+			isDownloading = false;
+		}
+	}
 </script>
 
 <section class="flex flex-col">
@@ -89,6 +136,47 @@
 			<!-- </div> -->
 		</div>
 		<div class="ml-auto flex flex-col gap-y-6 **:w-full **:text-lg">
+			<Modal bind:open={downloadOpen} buttonText="Download Registrations CSV">
+				<div class="flex flex-col gap-y-8 px-8 py-6">
+					<div class="text-xl font-semibold">Download Registrations</div>
+					<div class="flex flex-col gap-y-4">
+						<div class="flex flex-col gap-y-2">
+							<label for="fromDate" class="text-lg font-medium">From Date</label>
+							<input
+								id="fromDate"
+								type="date"
+								bind:value={downloadFromDate}
+								class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+							/>
+						</div>
+						<div class="flex flex-col gap-y-2">
+							<label for="toDate" class="text-lg font-medium">To Date</label>
+							<input
+								id="toDate"
+								type="date"
+								bind:value={downloadToDate}
+								class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+							/>
+						</div>
+					</div>
+					<div class="ml-auto flex gap-x-4 self-end">
+						<Button
+							class=""
+							onclick={() => {
+								downloadOpen = false;
+								downloadFromDate = '';
+								downloadToDate = '';
+							}}>Cancel</Button
+						>
+						<Button
+							class=""
+							onclick={handleDownloadCSV}
+							disabled={isDownloading}>
+							{isDownloading ? 'Downloading...' : 'Download'}
+						</Button>
+					</div>
+				</div>
+			</Modal>
 			<Button>Import New List</Button>
 			<Modal
 				bind:open={regConfirm}
