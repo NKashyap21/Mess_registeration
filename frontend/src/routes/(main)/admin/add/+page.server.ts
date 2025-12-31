@@ -2,7 +2,7 @@ import { PRIVATE_API_URL } from '$env/static/private';
 import type { Actions } from './$types';
 
 export const actions = {
-	default: async ({ fetch, request }) => {
+	addUser: async ({ fetch, request }) => {
 		const formData = await request.formData();
 
 		const jsonData = {
@@ -26,6 +26,43 @@ export const actions = {
 		} else {
 			return {
 				message: `Failed to add user.\nReason: ${(await res.json()).error}`
+			};
+		}
+	},
+
+	uploadCSV: async ({ fetch, request }) => {
+		const formData = await request.formData();
+		const file = formData.get('file');
+
+		if (!file || !(file instanceof File)) {
+			return {
+				success: false,
+				message: 'No file uploaded'
+			};
+		}
+
+		const uploadFormData = new FormData();
+		uploadFormData.append('file', file);
+
+		const res = await fetch(PRIVATE_API_URL + '/office/students/upload-csv', {
+			method: 'POST',
+			body: uploadFormData,
+			credentials: 'include'
+		});
+
+		if (res.status === 200) {
+			const data = await res.json();
+			return {
+				success: true,
+				message: data.message,
+				recordsAdded: data.records_added,
+				errors: data.errors || []
+			};
+		} else {
+			const error = await res.json();
+			return {
+				success: false,
+				message: error.error || 'Failed to upload CSV'
 			};
 		}
 	}
