@@ -12,7 +12,7 @@ import (
 func (sc *SwapController) AcceptSwapRequestHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 
-	var selectedSwapRequest models.SwapRequest
+	var selectedSwapRequest db.SwapRequest
 	utils.ParseJSONRequest(c, &selectedSwapRequest)
 
 	var user models.User
@@ -46,10 +46,10 @@ func (sc *SwapController) AcceptSwapRequestHandler(c *gin.Context) {
 	}
 }
 
-func (sc *SwapController) acceptPublicSwapRequest(userID uint, selectedSwapRequest models.SwapRequest, c *gin.Context) {
+func (sc *SwapController) acceptPublicSwapRequest(userID uint, selectedSwapRequest db.SwapRequest, c *gin.Context) {
 	// Check if the selected swap request exists and is of type 'public'
 	var existingRequest db.SwapRequest
-	if err := sc.DB.First(&existingRequest, "id = ? AND type = ?", selectedSwapRequest.UserID, "public").Error; err != nil {
+	if err := sc.DB.First(&existingRequest, "user_id = ? AND type = ?", selectedSwapRequest.UserID, "public").Error; err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Swap request not found")
 		return
 	}
@@ -90,7 +90,7 @@ func (sc *SwapController) acceptPublicSwapRequest(userID uint, selectedSwapReque
 	}
 
 	// Delete the accepted swap request
-	if err := sc.DB.Delete(&existingRequest).Error; err != nil {
+	if err := sc.DB.Where("user_id = ?", existingRequest.UserID).Delete(&existingRequest).Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete swap request")
 		return
 	}
@@ -100,10 +100,10 @@ func (sc *SwapController) acceptPublicSwapRequest(userID uint, selectedSwapReque
 	})
 }
 
-func (sc *SwapController) acceptFriendSwapRequest(userID uint, selectedSwapRequest models.SwapRequest, c *gin.Context) {
+func (sc *SwapController) acceptFriendSwapRequest(userID uint, selectedSwapRequest db.SwapRequest, c *gin.Context) {
 	// Check if the selected swap request exists and is of type 'friend'
-	var existingRequest models.SwapRequest
-	if err := sc.DB.First(&existingRequest, "id = ? AND type = ?", selectedSwapRequest.UserID, "friend").Error; err != nil {
+	var existingRequest db.SwapRequest
+	if err := sc.DB.First(&existingRequest, "user_id = ? AND type = ?", selectedSwapRequest.UserID, "friend").Error; err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Swap request not found")
 		return
 	}
@@ -150,7 +150,7 @@ func (sc *SwapController) acceptFriendSwapRequest(userID uint, selectedSwapReque
 	}
 
 	// Delete the accepted swap request
-	if err := sc.DB.Delete(&existingRequest).Error; err != nil {
+	if err := sc.DB.Where("user_id = ?", existingRequest.UserID).Delete(&existingRequest).Error; err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to delete swap request")
 		return
 	}

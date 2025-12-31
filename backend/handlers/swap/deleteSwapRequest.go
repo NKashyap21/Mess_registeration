@@ -3,6 +3,7 @@ package swap
 import (
 	"net/http"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ func (sc *SwapController) DeleteSwapHandler(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 	
 	// Check if there exists a swap request for this user
-	var existingRequest models.SwapRequest
+	var existingRequest db.SwapRequest
 	err := sc.DB.First(&existingRequest, "user_id = ?", userID).Error
 	if err == gorm.ErrRecordNotFound {
 		utils.RespondWithError(c, http.StatusBadRequest, "No swap request found for this user")

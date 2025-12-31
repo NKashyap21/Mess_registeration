@@ -3,6 +3,7 @@ package swap
 import (
 	"net/http"
 
+	"github.com/LambdaIITH/mess_registration/db"
 	"github.com/LambdaIITH/mess_registration/models"
 	"github.com/LambdaIITH/mess_registration/utils"
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,7 @@ func (sc *SwapController) GetAllSwapRequestsHandler(c *gin.Context) {
 func (sc *SwapController) GetSwapRequestsByID(c *gin.Context) {
 	userID := utils.ValidateSession(c)
 
-	var swapRequest models.SwapRequest
+	var swapRequest db.SwapRequest
 	err := sc.DB.Table("swap_requests").
 		Select("swap_requests.*, users.email, users.name").
 		Joins("join users on users.id = swap_requests.user_id").

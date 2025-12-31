@@ -7,7 +7,7 @@ type SwapRequest struct {
 	Email     string    `json:"email,omitempty"`
 	Type      string    `json:"type" validate:"required,oneof='friend' 'public'"`
 	Password  string    `json:"password" validate:"required,min=6,max=100"`
-	UserID    uint      `json:"-" gorm:"foreignKey"`
+	UserID    uint      `json:"user_id" gorm:"foreignKey"`
 	Direction string    `json:"direction"` // A to B or B to A
 	Completed bool      `json:"completed" gorm:"default:false"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`

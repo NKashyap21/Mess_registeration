@@ -80,11 +80,11 @@
 					Go for Veg Registration
 				</Button>
 			{/if}
-			{#if data.userMessData.data.current_mess != 0 && (data.userMessData?.data.current_mess ?? 5) != 5}
+			{/if}
+			{#if data.userMessData.data.mess != 0 && (data.userMessData?.data.mess ?? 5) != 5}
 				<Button onclick={() => goto(resolve('/student/swap'))} class="w-full sm:w-auto"
 					>Swap Mess</Button
 				>
 			{/if}
-		{/if}
 	</div>
 </section>
