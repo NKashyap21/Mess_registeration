@@ -1,13 +1,110 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import Button from '$lib/components/common/Button.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import CustomSelect from '$lib/components/common/CustomSelect.svelte';
 
 	let rollNo = $state('');
-	let searchData = $state<{ Name: string; RollNo: string; Mess: number | string }>({
+	let searchData = $state<{ Name: string; RollNo: string; Mess: number | string; Email: string }>({
 		Name: '',
 		Mess: '',
-		RollNo: ''
+		RollNo: '',
+		Email: ''
 	});
+
+	let swapMessModalOpen = $state(false);
+	let deregisterModalOpen = $state(false);
+
+	let selectedMess = $state('');
+	let isSubmitting = $state(false);
+
+	const messOptions = [
+		{ label: 'Mess A - LDH', value: '1' },
+		{ label: 'Mess A - UDH', value: '2' },
+		{ label: 'Mess B - LDH', value: '3' },
+		{ label: 'Mess B - UDH', value: '4' }
+	];
+
+	function getMessLabel(messNumber: number | string): string {
+		if (typeof messNumber !== 'number') return 'Unregistered';
+		const mess = messOptions.find((m) => m.value === messNumber.toString());
+		return mess ? mess.label : 'Unknown';
+	}
+
+	function searchStudent() {
+		if (!rollNo.trim()) {
+			alert('Please enter a roll number');
+			return;
+		}
+
+		fetch(PUBLIC_API_URL + '/office/students/' + rollNo, { credentials: 'include' })
+			.then((res) => {
+				if (res.status == 200) {
+					res.json().then((data) => {
+						searchData = data;
+						if (typeof data.Mess === 'number') {
+							selectedMess = data.Mess.toString();
+						} else {
+							selectedMess = '';
+						}
+					});
+				} else if (res.status == 404) {
+					alert('Student not found');
+				} else {
+					alert('Error fetching student data');
+				}
+			})
+			.catch((e) => {
+				console.error(e);
+				alert('Error connecting to server');
+			});
+	}
+
+	async function handleSwapMess() {
+		if (!selectedMess) {
+			alert('Please select a mess');
+			return;
+		}
+
+		if (!searchData.RollNo) {
+			alert('No student selected');
+			return;
+		}
+
+		isSubmitting = true;
+
+		try {
+			const response = await fetch(PUBLIC_API_URL + '/office/students/', {
+				method: 'PUT',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					roll_no: searchData.RollNo,
+					mess: parseInt(selectedMess),
+					can_register: true
+				})
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				alert(result.message || 'Mess updated successfully');
+				swapMessModalOpen = false;
+				searchStudent();
+			} else {
+				const error = await response.json();
+				alert(error.error || 'Failed to update mess');
+			}
+		} catch (e) {
+			console.error(e);
+			alert('Error connecting to server');
+		} finally {
+			isSubmitting = false;
+		}
+	}
+
+	async function handleDeregister() {}
 </script>
 
 <section class="flex w-full flex-col">
@@ -18,22 +115,11 @@
 			bind:value={rollNo}
 			onkeyup={(ev) => {
 				if (ev.key == 'Enter') {
-					fetch(PUBLIC_API_URL + '/office/students/' + rollNo, { credentials: 'include' })
-						.then((res) => {
-							if (res.status == 200) {
-								res.json().then((data) => {
-									searchData = data;
-								});
-							} else {
-								alert('Error');
-							}
-						})
-						.catch((e) => {
-							console.error(e);
-						});
+					searchStudent();
 				}
 			}}
 		/>
+		<Button class="ml-4" onclick={searchStudent}>Search</Button>
 		<div class="ml-auto flex items-center gap-x-2 text-custom-orange">
 			View Student History
 			<svg
@@ -52,39 +138,92 @@
 			</svg>
 		</div>
 	</div>
-	<div class="my-16 flex flex-row px-4 text-2xl">
-		<div class="grid grid-cols-2 gap-x-16 gap-y-8">
-			<p>Name:</p>
-			<p>{searchData?.Name ?? ''}</p>
-			<p>Roll No.:</p>
-			<p>{searchData?.RollNo ?? ''}</p>
-			<p>Registration Status:</p>
-			<p>{typeof searchData.Mess == 'number' ? 'Registered' : 'Unregistered'}</p>
-			<p>Registered Mess:</p>
-			<p>
-				{Object.keys(searchData).includes('Mess')
-					? searchData?.Mess == 1
-						? 'Mess A - LDH'
-						: searchData?.Mess == 2
-							? 'Mess A - UDH'
-							: searchData?.Mess == 3
-								? 'Mess B - LDH'
-								: searchData?.Mess == 4
-									? 'Mess B - UDH'
-									: 'Unknown'
-					: 'Unregistered'}
-			</p>
-			<p>Flagged</p>
-			<p>No</p>
+
+	{#if searchData.RollNo}
+		<div class="my-16 flex flex-row px-4 text-2xl">
+			<div class="grid grid-cols-2 gap-x-16 gap-y-8">
+				<p>Name:</p>
+				<p>{searchData?.Name ?? ''}</p>
+				<p>Roll No.:</p>
+				<p>{searchData?.RollNo ?? ''}</p>
+				<p>Registration Status:</p>
+				<p>{typeof searchData.Mess == 'number' ? 'Registered' : 'Unregistered'}</p>
+				<p>Registered Mess:</p>
+				<p>{getMessLabel(searchData.Mess)}</p>
+				<p>Flagged</p>
+				<p>No</p>
+			</div>
+			<div
+				class="ml-24 flex w-max grow flex-col items-center justify-center border-l-2 border-l-custom-mid-grey"
+			>
+				<img src="" alt="profile pic" class="size-[12rem] rounded-full bg-white" />
+			</div>
 		</div>
-		<div
-			class="ml-24 flex w-max grow flex-col items-center justify-center border-l-2 border-l-custom-mid-grey"
-		>
-			<img src="" alt="profile pic" class="size-[12rem] rounded-full bg-white" />
+		<div class="flex gap-x-4">
+			<Modal bind:open={swapMessModalOpen} buttonText="Change Mess" class="ml-auto">
+				<div class="flex flex-col gap-y-4 p-6">
+					<h2 class="text-2xl font-semibold">Change Student Mess</h2>
+					<p class="text-lg">
+						Student: <span class="font-semibold">{searchData.Name}</span> ({searchData.RollNo})
+					</p>
+					<p class="text-lg">
+						Current Mess: <span class="font-semibold">{getMessLabel(searchData.Mess)}</span>
+					</p>
+					<div class="mt-4 flex flex-col gap-y-2">
+						<label for="mess-select" class="text-lg font-medium">Select New Mess:</label>
+						<CustomSelect bind:value={selectedMess} items={messOptions} widthClass="w-full" />
+					</div>
+					<div class="mt-6 flex gap-x-4">
+						<Button
+							onclick={handleSwapMess}
+							disabled={isSubmitting || !selectedMess}
+							class="flex-1"
+						>
+							{isSubmitting ? 'Updating...' : 'Confirm Change'}
+						</Button>
+						<Button
+							onclick={() => {
+								swapMessModalOpen = false;
+								// Reset to current mess
+								if (typeof searchData.Mess === 'number') {
+									selectedMess = searchData.Mess.toString();
+								}
+							}}
+							disabled={isSubmitting}
+							class="flex-1"
+						>
+							Cancel
+						</Button>
+					</div>
+				</div>
+			</Modal>
+
+			<Modal bind:open={deregisterModalOpen} buttonText="Deregister">
+				<div class="flex flex-col gap-y-4 p-6">
+					<h2 class="text-2xl font-semibold">Deregister Student</h2>
+					<p class="text-lg">
+						Student: <span class="font-semibold">{searchData.Name}</span> ({searchData.RollNo})
+					</p>
+					<p class="text-lg">
+						Current Mess: <span class="font-semibold">{getMessLabel(searchData.Mess)}</span>
+					</p>
+
+					<div class="mt-6 flex gap-x-4">
+						<Button onclick={handleDeregister} disabled={isSubmitting} class="flex-1">
+							{isSubmitting ? 'Deregistering...' : 'Confirm Deregister'}
+						</Button>
+						<Button
+							onclick={() => {
+								deregisterModalOpen = false;
+							}}
+							disabled={isSubmitting}
+							class="flex-1"
+						>
+							Cancel
+						</Button>
+					</div>
+				</div>
+			</Modal>
 		</div>
-	</div>
-	<div class="flex gap-x-4">
-		<Button class="ml-auto">Swap Mess</Button>
-		<Button>Deregister</Button>
-	</div>
+	{/if}
 </section>

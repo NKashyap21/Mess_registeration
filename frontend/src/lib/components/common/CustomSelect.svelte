@@ -31,13 +31,13 @@
 	</Select.Trigger>
 	<Select.Portal>
 		<Select.Content
-			class="mt-2 w-[14rem] {colorScheme.dark
+			class="z-[9999] mt-2 w-[14rem] {colorScheme.dark
 				? 'dark'
 				: ''} {widthClass} rounded-md border border-custom-red bg-custom-off-white px-2 py-3 dark:border-custom-light-grey dark:bg-custom-mid-grey dark:text-white "
 		>
 			<Select.ScrollUpButton />
 			<Select.Viewport class="dark:bg-custom-mid-grey">
-				{#each items as item}
+				{#each items as item (item.value)}
 					<Select.Item
 						value={item.value}
 						class="flex w-full flex-col items-start rounded-sm bg-custom-off-white px-2 py-4 text-center leading-0 select-none not-last:mb-2 data-highlighted:brightness-95 dark:bg-custom-mid-grey"

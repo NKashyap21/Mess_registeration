@@ -17,74 +17,74 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *AuthController) handleMobileLogin(c *gin.Context) {
-	logger := services.GetLoggerService()
+// func (a *AuthController) handleMobileLogin(c *gin.Context) {
+// 	logger := services.GetLoggerService()
 
-	var payload struct {
-		Token string `json:"token"`
-	}
+// 	var payload struct {
+// 		Token string `json:"token"`
+// 	}
 
-	if err := utils.ParseJSONRequest(c, &payload); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid JSON payload", c.ClientIP())
-		return
-	}
+// 	if err := utils.ParseJSONRequest(c, &payload); err != nil {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid JSON payload", c.ClientIP())
+// 		return
+// 	}
 
-	if payload.Token == "" {
-		utils.RespondWithError(c, http.StatusBadRequest, "Token is required")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Empty token", c.ClientIP())
-		return
-	}
+// 	if payload.Token == "" {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Token is required")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Empty token", c.ClientIP())
+// 		return
+// 	}
 
-	parts := strings.Split(payload.Token, ".")
-	if len(parts) != 3 {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid token format")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid token format", c.ClientIP())
-		return
-	}
+// 	parts := strings.Split(payload.Token, ".")
+// 	if len(parts) != 3 {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid token format")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid token format", c.ClientIP())
+// 		return
+// 	}
 
-	decoded, err := base64.RawStdEncoding.DecodeString(parts[1])
-	if err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Failed to decode token")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Token decode error", c.ClientIP())
-		return
-	}
+// 	decoded, err := base64.RawStdEncoding.DecodeString(parts[1])
+// 	if err != nil {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Failed to decode token")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Token decode error", c.ClientIP())
+// 		return
+// 	}
 
-	var jwtData map[string]any
-	if err := json.Unmarshal(decoded, &jwtData); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Failed to parse token")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Token parse error", c.ClientIP())
-		return
-	}
+// 	var jwtData map[string]any
+// 	if err := json.Unmarshal(decoded, &jwtData); err != nil {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Failed to parse token")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Token parse error", c.ClientIP())
+// 		return
+// 	}
 
-	email, ok := jwtData["email"].(string)
-	if !ok || email == "" {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid email in token")
-		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid email", c.ClientIP())
-		return
-	}
+// 	email, ok := jwtData["email"].(string)
+// 	if !ok || email == "" {
+// 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid email in token")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", "Invalid email", c.ClientIP())
+// 		return
+// 	}
 
-	var user models.User
-	if err := a.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		utils.RespondWithError(c, http.StatusUnauthorized, "User not found")
-		logger.LogAuthAction(0, "LOGIN_FAILED", fmt.Sprintf("User not found: %s", email), c.ClientIP())
-		return
-	}
+// 	var user models.User
+// 	if err := a.DB.Where("email = ?", email).First(&user).Error; err != nil {
+// 		utils.RespondWithError(c, http.StatusUnauthorized, "User not found")
+// 		logger.LogAuthAction(0, "LOGIN_FAILED", fmt.Sprintf("User not found: %s", email), c.ClientIP())
+// 		return
+// 	}
 
-	tokenString, err := services.GenerateJWT(user.ID, user.Type, email, jwtData["name"].(string), jwtData["picture"].(string), config.GetJWTConfig().SecretKey)
-	if err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, "Error creating token")
-		logger.LogAuthAction(user.ID, "LOGIN_FAILED", "JWT generation error", c.ClientIP())
-		return
-	}
+// 	tokenString, err := services.GenerateJWT(user.ID, user.Type, email, jwtData["name"].(string), jwtData["picture"].(string), config.GetJWTConfig().SecretKey)
+// 	if err != nil {
+// 		utils.RespondWithError(c, http.StatusInternalServerError, "Error creating token")
+// 		logger.LogAuthAction(user.ID, "LOGIN_FAILED", "JWT generation error", c.ClientIP())
+// 		return
+// 	}
 
-	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("Mobile login: %s", email), c.ClientIP())
+// 	logger.LogAuthAction(user.ID, "LOGIN_SUCCESS", fmt.Sprintf("Mobile login: %s", email), c.ClientIP())
 
-	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
-		Message: "Login successful",
-		Data:    map[string]interface{}{"token": tokenString, "user": user},
-	})
-}
+// 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
+// 		Message: "Login successful",
+// 		Data:    map[string]interface{}{"token": tokenString, "user": user},
+// 	})
+// }
 
 func (a *AuthController) GoogleLoginHandler(c *gin.Context) {
 	logger := services.GetLoggerService()

@@ -43,7 +43,7 @@ func SetupRouter() *gin.Engine {
 	api.GET("/login", authController.GoogleLoginRedirect)
 	api.GET("/login-code", authController.GoogleLoginHandler)
 	api.GET("/getUser", middleware.TokenRequired(config.GetDB(), &gin.Context{}), userController.GetUserInfoHandler)
-	api.POST("/login", authController.GoogleLoginRedirect) // For mobile ID token login
+	// api.POST("/login", authController.GoogleLoginRedirect) // For mobile ID token login
 	api.POST("/logout", authController.Logout)
 
 	students := api.Group("/students")

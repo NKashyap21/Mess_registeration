@@ -12,11 +12,11 @@ import (
 
 // TODO: state param for csrf
 func (a *AuthController) GoogleLoginRedirect(c *gin.Context) {
-	// Handle mobile POST request with ID token
-	if c.Request.Method == "POST" {
-		a.handleMobileLogin(c)
-		return
-	}
+	// // Handle mobile POST request with ID token
+	// if c.Request.Method == "POST" {
+	// 	a.handleMobileLogin(c)
+	// 	return
+	// }
 
 	// Original GET request for web OAuth redirect
 	utils.RespondWithJSON(c, http.StatusOK, models.APIResponse{
