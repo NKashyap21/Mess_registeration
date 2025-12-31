@@ -22,7 +22,8 @@
 		{ label: 'Mess A - LDH', value: '1' },
 		{ label: 'Mess A - UDH', value: '2' },
 		{ label: 'Mess B - LDH', value: '3' },
-		{ label: 'Mess B - UDH', value: '4' }
+		{ label: 'Mess B - UDH', value: '4' },
+		{ label: 'Veg Mess', value: '5' }
 	];
 
 	function getMessLabel(messNumber: number | string): string {
