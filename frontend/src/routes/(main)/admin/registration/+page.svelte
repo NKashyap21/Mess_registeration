@@ -12,8 +12,82 @@
 	let downloadFromDate = $state('');
 	let downloadToDate = $state('');
 	let isDownloading = $state(false);
+	let archiveOpen = $state(false);
+	let archiveMonth = $state(new Date().getMonth() + 1);
+	let archiveYear = $state(new Date().getFullYear());
+	let isArchiving = $state(false);
+	let viewArchiveOpen = $state(false);
+	let archivedData: { users: string[]; scans: string[] } | null = $state(null);
+	let isLoadingArchive = $state(false);
+	let archiveLoadAttempted = $state(false);
 
 	console.log(data);
+
+	async function handleArchiveCycle() {
+		isArchiving = true;
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/office/archive/cycle`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					month: archiveMonth,
+					year: archiveYear
+				})
+			});
+
+			const result = await response.json();
+			if (!response.ok) {
+				alert(result.error ?? 'Failed to archive cycle');
+				return;
+			}
+
+			alert(result.message ?? 'Cycle archived successfully');
+			archiveOpen = false;
+			invalidateAll();
+		} catch (err) {
+			console.error('Archive error:', err);
+			alert('Error archiving cycle');
+		} finally {
+			isArchiving = false;
+		}
+	}
+
+	async function loadArchivedData() {
+		isLoadingArchive = true;
+		archiveLoadAttempted = true;
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/office/archive/list`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			const result = await response.json();
+			if (!response.ok) {
+				alert(result.error ?? 'Failed to load archived data');
+				return;
+			}
+
+			archivedData = result;
+		} catch (err) {
+			console.error('Load archive error:', err);
+			alert('Error loading archived data');
+		} finally {
+			isLoadingArchive = false;
+		}
+	}
+
+	$effect(() => {
+		if (viewArchiveOpen && !archiveLoadAttempted) {
+			loadArchivedData();
+		}
+		if (!viewArchiveOpen) {
+			archiveLoadAttempted = false;
+			archivedData = null;
+		}
+	});
 
 	async function handleDownloadCSV() {
 		if (!downloadFromDate || !downloadToDate) {
@@ -177,7 +251,7 @@
 					</div>
 				</div>
 			</Modal>
-			<Button>Import New List</Button>
+			<!-- <Button>Import New List</Button> -->
 			<Modal
 				bind:open={regConfirm}
 				buttonText="{data.status.data['registration_status']['normal']
@@ -280,6 +354,161 @@
 						>
 					</div>
 				</div>
+			</Modal>
+
+			<Modal bind:open={archiveOpen} buttonText="Archive Registration">
+				<div class="flex flex-col gap-y-8 px-8 py-6">
+					<div class="text-xl font-semibold">Archive Current Cycle</div>
+					<div class="rounded-lg border border-yellow-500 bg-yellow-100 p-4 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+						<p class="font-bold">Warning</p>
+						<p class="text-sm">This cannot be undone!</p>
+					</div>
+					<div class="flex flex-col gap-y-4">
+						<div class="flex flex-col gap-y-2">
+							<label for="archiveMonth" class="text-lg font-medium">Month</label>
+							<select
+								id="archiveMonth"
+								bind:value={archiveMonth}
+								class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+							>
+								<option value={1}>January</option>
+								<option value={2}>February</option>
+								<option value={3}>March</option>
+								<option value={4}>April</option>
+								<option value={5}>May</option>
+								<option value={6}>June</option>
+								<option value={7}>July</option>
+								<option value={8}>August</option>
+								<option value={9}>September</option>
+								<option value={10}>October</option>
+								<option value={11}>November</option>
+								<option value={12}>December</option>
+							</select>
+						</div>
+						<div class="flex flex-col gap-y-2">
+							<label for="archiveYear" class="text-lg font-medium">Year</label>
+							<input
+								id="archiveYear"
+								type="number"
+								bind:value={archiveYear}
+								min="2020"
+								max="2100"
+								class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+							/>
+						</div>
+					</div>
+					<div class="ml-auto flex gap-x-4 self-end">
+						<Button
+							onclick={() => {
+								archiveOpen = false;
+							}}>Cancel</Button
+						>
+						<Button
+							onclick={handleArchiveCycle}
+							disabled={isArchiving}>
+							{isArchiving ? 'Archiving...' : 'Archive'}
+						</Button>
+					</div>
+				</div>
+			</Modal>
+
+			<Modal bind:open={viewArchiveOpen} buttonText="View Archived Data">
+				{#snippet children()}
+					<div class="flex flex-col gap-y-6 px-8 py-6 min-w-[500px]">
+						<div class="text-2xl font-bold">Archived Data</div>
+						{#if isLoadingArchive}
+							<div class="text-center py-8">Loading...</div>
+						{:else if archivedData}
+							<div class="flex flex-col gap-y-6 max-h-[400px] overflow-y-auto pr-2">
+								<div class="flex flex-col gap-y-3">
+									<h3 class="text-lg font-semibold border-b pb-2 dark:border-gray-600">Users Archives</h3>
+									{#if archivedData.users && archivedData.users.length > 0}
+										<div class="flex flex-col gap-y-2">
+											{#each archivedData.users as table}
+												{@const parts = table.replace('users_', '').split('_')}
+												{@const month = parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : ''}
+												{@const year = parts[1] ?? ''}
+												<Button
+													class="w-full justify-start"
+													onclick={async () => {
+														const response = await fetch(
+															`${PUBLIC_API_URL}/office/archive/students/download-csv?table=${table}`,
+															{ method: 'GET', credentials: 'include' }
+														);
+														if (response.ok) {
+															const blob = await response.blob();
+															const url = window.URL.createObjectURL(blob);
+															const a = document.createElement('a');
+															a.href = url;
+															a.download = `${table}.csv`;
+															document.body.appendChild(a);
+															a.click();
+															window.URL.revokeObjectURL(url);
+															document.body.removeChild(a);
+														} else {
+															const err = await response.json();
+															alert(err.error ?? 'Failed to download');
+														}
+													}}>
+													Download {month} {year} Users CSV
+												</Button>
+											{/each}
+										</div>
+									{:else}
+										<p class="text-sm text-gray-500 italic">No archived users tables found</p>
+									{/if}
+								</div>
+								<div class="flex flex-col gap-y-3">
+									<h3 class="text-lg font-semibold border-b pb-2 dark:border-gray-600">Scans Archives</h3>
+									{#if archivedData.scans && archivedData.scans.length > 0}
+										<div class="flex flex-col gap-y-2">
+											{#each archivedData.scans as table}
+												{@const parts = table.replace('scans_', '').split('_')}
+												{@const month = parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : ''}
+												{@const year = parts[1] ?? ''}
+												<Button
+													class="w-full justify-start"
+													onclick={async () => {
+														const response = await fetch(
+															`${PUBLIC_API_URL}/office/archive/scans/download-csv?table=${table}`,
+															{ method: 'GET', credentials: 'include' }
+														);
+														if (response.ok) {
+															const blob = await response.blob();
+															const url = window.URL.createObjectURL(blob);
+															const a = document.createElement('a');
+															a.href = url;
+															a.download = `${table}.csv`;
+															document.body.appendChild(a);
+															a.click();
+															window.URL.revokeObjectURL(url);
+															document.body.removeChild(a);
+														} else {
+															const err = await response.json();
+															alert(err.error ?? 'Failed to download');
+														}
+													}}>
+													Download {month} {year} Scans CSV
+												</Button>
+											{/each}
+										</div>
+									{:else}
+										<p class="text-sm text-gray-500 italic">No archived scans tables found</p>
+									{/if}
+								</div>
+							</div>
+						{:else}
+							<p class="text-sm text-gray-500">No archived data found</p>
+						{/if}
+						<div class="ml-auto">
+							<Button
+								onclick={() => {
+									viewArchiveOpen = false;
+								}}>Close</Button
+							>
+						</div>
+					</div>
+				{/snippet}
 			</Modal>
 			<!-- <Button>Enable Latest Registration</Button> -->
 		</div>
