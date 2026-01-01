@@ -53,7 +53,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 
 	// Fetch user details from the database
 	var user models.User
-	if err := sc.DB.Where("roll_no = ?", rollNo).First(&user).Error; err != nil {
+	if err := sc.DB.Where("roll_no ilike ?", rollNo).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			utils.RespondWithJSON(c, http.StatusNotFound, models.APIResponse{
 				Message: "User not found",
@@ -134,7 +134,7 @@ func (sc *ScanningController) ScanningHandler(c *gin.Context) {
 	}
 
 	// Log scan in DB
-	scan, err := db.LogCurrentMeal(sc.DB, user.ID, uint(user.Mess))
+	scan, err := db.LogCurrentMeal(sc.DB, user.ID, uint(user.Mess), mealName)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to log scan in DB: "+err.Error())
 		return

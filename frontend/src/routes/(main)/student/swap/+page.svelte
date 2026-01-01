@@ -91,8 +91,7 @@
 
 		isAccepting = true;
 		try {
-
-			console.log(selectedSwap)
+			console.log(selectedSwap);
 
 			const response = await fetch(PUBLIC_API_URL + '/students/acceptSwap', {
 				method: 'POST',
@@ -134,22 +133,26 @@
 		acceptSwapModal = true;
 	}
 
-	console.log(data)
+	console.log(data);
 </script>
 
-<div class="flex flex-col px-4 sm:px-8 md:px-16 py-6 dark:text-white">
-	<h1 class="text-center text-2xl sm:text-3xl md:text-[2.5rem] font-semibold mb-6">
+<div class="flex flex-col px-4 py-6 sm:px-8 md:px-16 dark:text-white">
+	<h1 class="mb-6 text-center text-2xl font-semibold sm:text-3xl md:text-[2.5rem]">
 		Mess Swapping
 	</h1>
 
 	{#if data.mySwap}
-		<div class="mx-auto mb-6 sm:mb-8 w-full max-w-md rounded-lg border border-gray-300 bg-gray-50 p-4 sm:p-6 dark:border-gray-600 dark:bg-gray-900">
+		<div
+			class="mx-auto mb-6 w-full max-w-md rounded-lg border border-gray-300 bg-gray-50 p-4 sm:mb-8 sm:p-6 dark:border-gray-600 dark:bg-gray-900"
+		>
 			<div class="flex flex-col items-center gap-y-3 sm:gap-y-4">
-				<h2 class="text-base sm:text-lg font-semibold">Your Active Swap Request</h2>
-				<div class="flex gap-x-6 sm:gap-x-8 text-center">
+				<h2 class="text-base font-semibold sm:text-lg">Your Active Swap Request</h2>
+				<div class="flex gap-x-6 text-center sm:gap-x-8">
 					<div class="flex flex-col">
 						<span class="text-xs text-gray-500 dark:text-gray-400">Type</span>
-						<span class="text-sm font-medium capitalize">{data.mySwap.type === 'friend' ? 'Private' : 'Public'}</span>
+						<span class="text-sm font-medium capitalize"
+							>{data.mySwap.type === 'friend' ? 'Private' : 'Public'}</span
+						>
 					</div>
 					<div class="flex flex-col">
 						<span class="text-xs text-gray-500 dark:text-gray-400">Status</span>
@@ -161,25 +164,31 @@
 		</div>
 	{/if}
 
-	<div class="flex justify-center w-full">
-		<div class="flex flex-col items-center gap-y-3 sm:gap-y-4 w-full max-w-2xl">
-			<h2 class="text-2xl sm:text-3xl md:text-4xl font-medium text-center">Private Swap Requests</h2>
-			<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Click on a request to accept it</p>
+	<div class="flex w-full justify-center">
+		<div class="flex w-full max-w-2xl flex-col items-center gap-y-3 sm:gap-y-4">
+			<h2 class="text-center text-2xl font-medium sm:text-3xl md:text-4xl">
+				Private Swap Requests
+			</h2>
+			<p class="text-xs text-gray-500 sm:text-sm dark:text-gray-400">
+				Click on a request to accept it
+			</p>
 			<CustomScrollbar>
-				<div class="flex flex-col gap-y-2 h-[16rem] sm:h-[20rem] w-full pr-2 sm:pr-4">
+				<div class="flex h-[16rem] w-full flex-col gap-y-2 pr-2 sm:h-[20rem] sm:pr-4">
 					{#each data.swapData.filter((s: any) => s.type === 'friend' && s.name !== data.user.name) as swap, idx (swap)}
 						<button
-							class="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 text-left transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-800"
+							class="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-left transition-colors hover:bg-gray-100 sm:px-4 sm:py-3 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-800"
 							onclick={() => openAcceptModal(swap)}
 						>
-							<div class="flex items-center gap-x-2 sm:gap-x-4 min-w-0 flex-1">
-								<span class="text-xs sm:text-sm text-gray-500 shrink-0">{idx + 1}.</span>
-								<div class="flex flex-col min-w-0">
-									<span class="font-medium truncate text-sm sm:text-base" title={swap.name}>{swap.name}</span>
+							<div class="flex min-w-0 flex-1 items-center gap-x-2 sm:gap-x-4">
+								<span class="shrink-0 text-xs text-gray-500 sm:text-sm">{idx + 1}.</span>
+								<div class="flex min-w-0 flex-col">
+									<span class="truncate text-sm font-medium sm:text-base" title={swap.name}
+										>{swap.name}</span
+									>
 									<span class="text-xs text-gray-500">{swap.direction}</span>
 								</div>
 							</div>
-							<span class="text-xs sm:text-sm text-custom-orange shrink-0 ml-2">Accept →</span>
+							<span class="ml-2 shrink-0 text-xs text-custom-orange sm:text-sm">Accept →</span>
 						</button>
 					{:else}
 						<div class="flex h-full items-center justify-center text-gray-500 text-sm">
@@ -192,37 +201,39 @@
 	</div>
 
 	{#if !data.mySwap}
-		<div class="flex items-center justify-center mt-6 sm:mt-8">
+		<div class="mt-6 flex items-center justify-center sm:mt-8">
 			<Modal buttonText="Create Swap Request" bind:open={createSwapModal}>
-				<div class="flex flex-col gap-y-4 sm:gap-y-6 px-4 sm:px-8 py-4 sm:py-6 w-full min-w-0 sm:min-w-[400px] max-w-[90vw]">
-					<h2 class="text-xl sm:text-2xl font-semibold">Create Swap Request</h2>
+				<div
+					class="flex w-full max-w-[90vw] min-w-0 flex-col gap-y-4 px-4 py-4 sm:min-w-[400px] sm:gap-y-6 sm:px-8 sm:py-6"
+				>
+					<h2 class="text-xl font-semibold sm:text-2xl">Create Swap Request</h2>
 
 					<div class="flex flex-col gap-y-4">
 						<div class="flex flex-col gap-y-2">
-							<label class="text-base sm:text-lg font-medium">Swap Type</label>
+							<label class="text-base font-medium sm:text-lg">Swap Type</label>
 							<div class="flex flex-wrap gap-x-4 gap-y-2">
-								<label class="flex items-center gap-x-2 cursor-pointer">
+								<label class="flex cursor-pointer items-center gap-x-2">
 									<input
 										type="radio"
 										name="swapType"
 										value="public"
 										bind:group={swapType}
-										class="w-4 h-4"
+										class="h-4 w-4"
 									/>
 									<span class="text-sm sm:text-base">Public</span>
 								</label>
-								<label class="flex items-center gap-x-2 cursor-pointer">
+								<label class="flex cursor-pointer items-center gap-x-2">
 									<input
 										type="radio"
 										name="swapType"
 										value="friend"
 										bind:group={swapType}
-										class="w-4 h-4"
+										class="h-4 w-4"
 									/>
 									<span class="text-sm sm:text-base">Private (Friend)</span>
 								</label>
 							</div>
-							<p class="text-xs sm:text-sm text-gray-500">
+							<p class="text-xs text-gray-500 sm:text-sm">
 								{swapType === 'public'
 									? 'Public swaps are visible to everyone and can be accepted by anyone.'
 									: 'Private swaps require a password. Share it with your friend to swap.'}
@@ -231,7 +242,7 @@
 
 						{#if swapType === 'friend'}
 							<div class="flex flex-col gap-y-2">
-								<label for="swapPassword" class="text-base sm:text-lg font-medium">
+								<label for="swapPassword" class="text-base font-medium sm:text-lg">
 									Password (share with friend)
 								</label>
 								<input
@@ -239,13 +250,13 @@
 									type="password"
 									bind:value={swapPassword}
 									placeholder="Enter password (6-100 characters)"
-									class="rounded-lg border border-gray-300 px-3 sm:px-4 py-2 text-sm sm:text-base dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+									class="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:px-4 sm:text-base dark:border-gray-600 dark:bg-gray-800 dark:text-white"
 								/>
 							</div>
 						{/if}
 					</div>
 
-					<div class="flex flex-col-reverse sm:flex-row sm:ml-auto gap-2 sm:gap-x-4">
+					<div class="flex flex-col-reverse gap-2 sm:ml-auto sm:flex-row sm:gap-x-4">
 						<Button
 							onclick={() => {
 								createSwapModal = false;
@@ -265,15 +276,17 @@
 
 {#if acceptSwapModal}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="rounded-lg bg-white p-4 sm:p-6 dark:bg-gray-800 dark:text-white w-full max-w-md">
-			<h2 class="text-xl sm:text-2xl font-semibold mb-4">Accept Private Swap</h2>
+		<div class="w-full max-w-md rounded-lg bg-white p-4 sm:p-6 dark:bg-gray-800 dark:text-white">
+			<h2 class="mb-4 text-xl font-semibold sm:text-2xl">Accept Private Swap</h2>
 
 			{#if selectedSwap}
-				<div class="flex flex-col gap-y-4 mb-6">
-					<div class="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-900">
-						<div class="grid grid-cols-2 gap-y-2 gap-x-3 sm:gap-x-4 text-sm">
+				<div class="mb-6 flex flex-col gap-y-4">
+					<div
+						class="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-900"
+					>
+						<div class="grid grid-cols-2 gap-x-3 gap-y-2 text-sm sm:gap-x-4">
 							<span class="text-gray-500">From:</span>
-							<span class="font-medium truncate">{selectedSwap.name}</span>
+							<span class="truncate font-medium">{selectedSwap.name}</span>
 							<span class="text-gray-500">Direction:</span>
 							<span class="font-medium">{selectedSwap.direction}</span>
 						</div>
@@ -286,14 +299,16 @@
 							type="password"
 							bind:value={acceptPassword}
 							placeholder="Enter the password shared by your friend"
-							class="rounded-lg border border-gray-300 px-3 sm:px-4 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+							class="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:px-4 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
 						/>
-						<p class="text-xs text-gray-500">Ask your friend for the password they set when creating this swap request.</p>
+						<p class="text-xs text-gray-500">
+							Ask your friend for the password they set when creating this swap request.
+						</p>
 					</div>
 				</div>
 			{/if}
 
-			<div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-x-4 sm:justify-end">
+			<div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-x-4">
 				<Button
 					onclick={() => {
 						acceptSwapModal = false;
@@ -311,10 +326,12 @@
 
 {#if deleteSwapModal}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="rounded-lg bg-white p-4 sm:p-6 dark:bg-gray-800 dark:text-white w-full max-w-md">
-			<h2 class="text-lg sm:text-xl font-semibold mb-4">Cancel Swap Request</h2>
-			<p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to cancel your swap request? This action cannot be undone.</p>
-			<div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-x-4 sm:justify-end">
+		<div class="w-full max-w-md rounded-lg bg-white p-4 sm:p-6 dark:bg-gray-800 dark:text-white">
+			<h2 class="mb-4 text-lg font-semibold sm:text-xl">Cancel Swap Request</h2>
+			<p class="mb-6 text-sm text-gray-600 sm:text-base dark:text-gray-300">
+				Are you sure you want to cancel your swap request? This action cannot be undone.
+			</p>
+			<div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-x-4">
 				<Button onclick={() => (deleteSwapModal = false)}>No, Keep It</Button>
 				<Button onclick={handleDeleteSwap} disabled={isDeleting}>
 					{isDeleting ? 'Cancelling...' : 'Yes, Cancel Request'}
