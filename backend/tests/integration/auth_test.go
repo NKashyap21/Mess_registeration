@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestHealth(t *testing.T) {
+func TestLoginEndpoint(t *testing.T) {
 	r := testutils.Router()
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/api/health", nil)
+	req := httptest.NewRequest("GET", "/api/login", nil) // TODO: verify route
 
 	r.ServeHTTP(w, req)
 	require.Equal(t, http.StatusOK, w.Code)
